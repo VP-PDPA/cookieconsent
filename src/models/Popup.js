@@ -140,7 +140,6 @@ export default class Popup extends Base {
 
   fadeIn() {
     const el = this.element
-    console.log(el);
 
     if (!this.hasTransition || !el) return
 
