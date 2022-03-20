@@ -108,9 +108,11 @@
   }
 }
 .cc-categories {
-  display: inline-flex;
+  display: block;
+  padding-left: 20px;
+  padding-bottom: 20px;
   .cc-category{
-    display  : flex;
+    display  : block;
     max-width: 100%;
     margin   : 0 2px;
     position : relative;
@@ -118,19 +120,22 @@
   .cc-btn {
     border-right: none;
     outline     : none;
-    text-transform: capitalize;
+    text-transform: capitalize;    
     input[type=checkbox]{
       float: left;
       height: 26px;
-      width: calc( 100% - 22px );
+      width: 26px;
       display: block;
       position: absolute;
-      top: 0;
-      left: 2px;
+      top: 5px;
+      left: 5px;
       cursor: pointer;
     }
     &:not(.cc-info):not(.cc-save){
       padding-left: 26px;
+    }
+    .cc-btn-checkbox {
+      margin-left: 10px;
     }
   }
   .cc-info {

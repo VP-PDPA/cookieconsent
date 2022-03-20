@@ -140,6 +140,7 @@ export default class Popup extends Base {
 
   fadeIn() {
     const el = this.element
+    console.log(el);
 
     if (!this.hasTransition || !el) return
 
@@ -329,7 +330,7 @@ export default class Popup extends Base {
   getPopupClasses() {
     const opts = this.options
     let positionStyle =
-      opts.position == 'top' || opts.position == 'bottom'
+      opts.position == 'top' || opts.position == 'bottom' || opts.position == 'top-push'
         ? 'banner'
         : 'floating'
 
