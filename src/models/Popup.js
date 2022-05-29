@@ -31,6 +31,15 @@ export default class Popup extends Base {
       ANALYTICS      : 'DISMISS',
       MARKETING      : 'DISMISS'
     }
+
+    const categoiesKey = Object.keys(this.userCategories);
+    categoiesKey.forEach((categoryName, idx) => {
+      const cookieName = this.options.cookie.name+'_'+categoryName
+      const val = getCookie(cookieName);
+      if (val === 'ALLOW' || val === 'DENY' || val === 'DISMISS')
+        this.userCategories[categoryName] = val;
+    });
+
     this.customStyles = {}
     this.hasTransition = !!(function() {
       const el = document.createElement('div')
@@ -280,7 +289,8 @@ export default class Popup extends Base {
     if ( arguments.length === 0 ) {
       categories.forEach( category => updateCategoryStatus( category, this.userCategories[ category ] ) )
     } else if (arguments.length === 1){
-      categories.forEach( category => updateCategoryStatus( category, arguments[ 0 ] ) )
+      categories.forEach( category => updateCategoryStatus( category, this.userCategories[ category ] ) )
+      //categories.forEach( category => updateCategoryStatus( category, arguments[ 0 ] ) )
     } else if ( arguments.length > 1 ) {
       arguments.forEach( ( categoryStatus, index ) => {
         updateCategoryStatus( this.userCategories[ index ], categoryStatus )
@@ -422,6 +432,7 @@ export default class Popup extends Base {
         this.userCategories[ checkbox.name ] = checkbox.checked ? 'ALLOW' : 'DENY'
       })
       checkbox.addEventListener( 'click', event => (event.stopPropagation()) )
+      checkbox.checked = this.userCategories[ checkbox.name ] === 'ALLOW';
     })
     el.querySelectorAll(".cc-info").forEach( showInfo => {
       showInfo.addEventListener('mousedown', function ( event ) {
@@ -596,7 +607,6 @@ export default class Popup extends Base {
       if (this.options.theme) {
         classes.push('cc-theme-'+this.options.theme)
       }
-      console.log( this.options.content.policy )
       const revokeBtn = this.options.revokeBtn
         .replace('{{classes}}', classes.join(' '))
         .replace('{{policy}}', this.options.content.policy)
