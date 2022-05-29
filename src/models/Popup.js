@@ -24,13 +24,13 @@ import {
 export default class Popup extends Base {
   constructor( options ) {
     super( defaultOptions, options )
-    this.userCategories = {
-      UNCATEGORIZED  : 'DISMISS',
-      ESSENTIAL      : 'ALLOW',
-      PERSONALIZATION: 'DISMISS',
-      ANALYTICS      : 'DISMISS',
-      MARKETING      : 'DISMISS'
-    }
+    this.userCategories = {};
+    Object.keys(categories).forEach((idx) => {
+      this.userCategories[categories[idx]] = (categories[idx] === 'ESSENTIAL')?'ALLOW':'DISMISS';
+    });
+
+    console.log(categories);
+    console.log(this.userCategories);
 
     const categoiesKey = Object.keys(this.userCategories);
     categoiesKey.forEach((categoryName, idx) => {
@@ -306,6 +306,15 @@ export default class Popup extends Base {
     return categories.map( categoryName => getCookie(this.options.cookie.name+'_'+categoryName) )
   }
 
+  exportCurrentStatuses() {
+    let output = {};
+    categories.forEach(categoryName => {
+      output[categoryName] = getCookie(this.options.cookie.name+'_'+categoryName);
+    });
+
+    return output;
+  }
+
   /**
    * Clear all cookie categoies statuses
    */
@@ -430,9 +439,16 @@ export default class Popup extends Base {
     el.querySelectorAll( '.cc-btn [type="checkbox"]' ).forEach( checkbox => {
       checkbox.addEventListener( 'change', () => {
         this.userCategories[ checkbox.name ] = checkbox.checked ? 'ALLOW' : 'DENY'
-      })
-      checkbox.addEventListener( 'click', event => (event.stopPropagation()) )
-      checkbox.checked = this.userCategories[ checkbox.name ] === 'ALLOW';
+      });
+      
+      if (checkbox.name === 'ESSENTIAL') {
+        checkbox.disabled = true;
+        checkbox.checked = true;
+      }
+      else {
+        checkbox.addEventListener( 'click', event => (event.stopPropagation()) )
+        checkbox.checked = this.userCategories[ checkbox.name ] === 'ALLOW';
+      }
     })
     el.querySelectorAll(".cc-info").forEach( showInfo => {
       showInfo.addEventListener('mousedown', function ( event ) {
