@@ -8,6 +8,120 @@ export const dataScanner =  JSON.parse('___replace_dataScanner___');
 export const dataCookies =  JSON.parse('___replace_dataCookies___');
 export const dataParam =  JSON.parse('___replace_dataParam___');
 
+/*
+export const dataScanner = [
+    {
+        "url": "https://www.googletagmanager.com/gtag/js?id=G-BYM1FJKL9N&l=dataLayer&cx=c",
+        "category": "analytics"
+    },
+    {
+        "url": "https://www.google-analytics.com/analytics.js",
+        "category": "analytics"
+    },
+    {
+        "url": "https://www.googletagmanager.com/gtag/js?id=UA-226567081-1",
+        "category": "analytics"
+    },
+    {
+        "url": "https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2FPrimesSolution%2F&tabs&width=340&height=130&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=false&appId=2402138786748434",
+        "category": "marketing"
+    }
+];
+export const dataCookies = [
+  {
+      "name": "_ga",
+      "domain": ".pcubedthai.com",
+      "path": "/",
+      "expires": 1717842503,
+      "detected": "https://pcubedthai.com",
+      "type": "javascript",
+      "source": "https://www.google-analytics.com/analytics.js",
+      "category": "analytics"
+  },
+  {
+      "name": "_ga_BYM1FJKL9N",
+      "domain": ".pcubedthai.com",
+      "path": "/",
+      "expires": 1717842503,
+      "detected": "https://pcubedthai.com",
+      "type": "javascript",
+      "source": "https://www.google-analytics.com/analytics.js",
+      "category": "analytics"
+  },
+  {
+      "name": "_gat_gtag_UA_226567081_1",
+      "domain": ".pcubedthai.com",
+      "path": "/",
+      "expires": 1654770563,
+      "detected": "https://pcubedthai.com",
+      "type": "javascript",
+      "source": "https://www.google-analytics.com/analytics.js",
+      "category": "analytics"
+  },
+  {
+      "name": "_gid",
+      "domain": ".pcubedthai.com",
+      "path": "/",
+      "expires": 1654856903,
+      "detected": "https://pcubedthai.com",
+      "type": "javascript",
+      "source": "https://www.google-analytics.com/analytics.js",
+      "category": "analytics"
+  }
+];
+export const dataParam =  {
+  "lang": {
+      "en": {
+          "allow": "Allow cookies",
+          "header": "Cookies used on the website!",
+          "customize": "Customize",
+          "link": "Learn more",
+          "dismiss": "Dismiss",
+          "message": "This website uses cookies to ensure you get the best experience on our website.",
+          "policy": "Cookie Policy",
+          "deny": "Decline",
+          "href": "https://www.google.com"
+      },
+      "th": {
+          "allow": "อนุญาติ",
+          "header": "มีการใช้คุกกี้ที่เว็บไซต์นี้",
+          "customize": "ปรับแต่ง",
+          "link": "เรียนรู้เพิ่มเติม",
+          "dismiss": "ปิด",
+          "message": "เว็บไซต์นี้มีการใช้านคุกกี้",
+          "policy": "อ่านข้อมูลเพิ่มเติม",
+          "deny": "ปฏิเสธ",
+          "href": "https://www.google.com"
+      }
+  },
+  "content": {
+      "allow": "Allow cookies",
+      "header": "Cookies used on the website!",
+      "customize": "Customize",
+      "link": "Learn more",
+      "dismiss": "Dismiss",
+      "message": "This website uses cookies to ensure you get the best experience on our website.",
+      "policy": "Cookie Policy",
+      "deny": "Decline",
+      "href": "https://www.google.com"
+  },
+  "palette": {
+      "popup": {
+          "background": "#3937A3FF",
+          "text": "#FFFFFFFF"
+      },
+      "button": {
+          "background": "#E62576FF",
+          "text": "#FFFFFFFF"
+      }
+  },
+  "position": "bottom-right",
+  "theme": "edgeless",
+  "type": "opt-in-detail",
+  "layout": "detail"
+};
+*/
+
 function formatData() {
   let dataCookiesHash = {};
   for (let i=0; i<dataCookies.length; i++) {
