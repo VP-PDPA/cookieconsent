@@ -112,6 +112,7 @@ export default class Popup extends Base {
   open() {
     if (!this.element) return
 
+    this.tmpUserCategories = this.userCategories;
     if (!this.isOpen()) {
       if (this.hasTransition) {
         this.fadeIn()
@@ -283,7 +284,7 @@ export default class Popup extends Base {
         setCookie(cookieName, status, expiryDays, domain, path, secure)
         this.emit( "statusChanged", cookieName, status, chosenBefore, this )
       } else {
-        this.clearStatuses()
+        //this.clearStatuses()
       }
     }
     if ( arguments.length === 0 ) {
@@ -292,6 +293,7 @@ export default class Popup extends Base {
       if (arguments[0] === statusAllow) {
         this.userCategories = this.tmpUserCategories;
         categories.forEach( category => updateCategoryStatus( category, this.userCategories[ category ] ) );
+        this.emit( "statusUpdated", this );
       }
     } else if ( arguments.length > 1 ) {
       arguments.forEach( ( categoryStatus, index ) => {

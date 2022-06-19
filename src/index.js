@@ -2,13 +2,22 @@
 
 import "./styles/main.scss"
 import CPopup from "./models/Popup"
-import {getCookie} from "./utils/cookie";
+import {getCookie, setCookie} from "./utils/cookie";
+import { v4 as uuidv4 } from 'uuid';
+import axios, {AxiosRequestConfig, AxiosPromise, Method} from 'axios';
 
+
+export const dataHost = '___replace_dataHost___';
+export const dataProjectId = '___replace_dataProjectId___';
+export const dataSettingId = '___replace_dataSettingId___';
 export const dataScanner =  JSON.parse('___replace_dataScanner___');
 export const dataCookies =  JSON.parse('___replace_dataCookies___');
 export const dataParam =  JSON.parse('___replace_dataParam___');
 
 /*
+export const dataHost = 'http://localhost:8889/api/v1/endUserCookieConsent';
+export const dataProjectId = '8ee777d7-05a0-4290-9bd4-9af1b4a1d772';
+export const dataSettingId = '2ee2f247-e5db-41ef-a5bc-40894eefcae9';
 export const dataScanner = [
     {
         "url": "https://www.googletagmanager.com/gtag/js?id=G-BYM1FJKL9N&l=dataLayer&cx=c",
@@ -115,10 +124,10 @@ export const dataParam =  {
           "text": "#FFFFFFFF"
       }
   },
-  "position": "bottom-right",
+  "position": "bottom",
   "theme": "edgeless",
-  "type": "opt-in-detail",
-  "layout": "detail"
+  "type": "opt-in",
+  //"layout": "detail"
 };
 */
 
@@ -145,7 +154,7 @@ function initCookie() {
       },
       set: function () {
           let name = arguments[0].split(';')[0].split('=')[0];
-          if (name.indexOf('cookieconsent_status') === -1) {
+          if (name.indexOf('cookieconsent_status') === -1 && name.indexOf('pcube_id') === -1) {
             let cinfo = dataCookiesHash[name];
             if (!cinfo || globalConsentStatus[cinfo.category.toUpperCase()] !== 'ALLOW') {
               globalCookieStorage[name] = arguments;
@@ -216,6 +225,31 @@ function blockUnblockScript(category, status) {
   }
 };
 
+let cookieId = getCookie('pcube_id');
+const currentUuid = cookieId===undefined?uuidv4():cookieId;
+if (cookieId === undefined)
+  setCookie('pcube_id', currentUuid, 365);
+
+function sendConsent(inst) {
+  let status = inst.getStatuses();
+  let statusInt = 0;
+  if (status) {
+    for(let i=0; i<status.length; i++) {
+      if (status[i] === 'ALLOW') {
+        statusInt |= (1<<i);
+      }
+    }
+  }
+
+  let data = {
+    projectId: dataProjectId,
+    settingId: dataSettingId,
+    sourceId: currentUuid,
+    consent: statusInt
+  }
+  axios.post(dataHost, data);
+}
+
 function showDialog() {
   const param = dataParam;
   let currentCC = new CPopup(param);
@@ -230,6 +264,12 @@ function showDialog() {
     if (inst === currentCC) {
       let part = p.split('_');
       blockUnblockScript(part[part.length-1], a)
+    }
+  });
+
+  currentCC.on( 'statusUpdated', (inst) => {
+    if (inst === currentCC) {
+      sendConsent(inst);
     }
   });
 
@@ -248,6 +288,11 @@ function showDialog() {
         blockUnblockScript(part[part.length-1], a);
       }
     });
+    popupCC.on( 'statusUpdated', (inst) => {
+      if (inst === popupCC) {
+        sendConsent(inst);
+      }
+    });
     popupCC.on( 'popupClosed', (inst) => {
       if (inst === popupCC) {
           inst.destroy();
@@ -255,7 +300,7 @@ function showDialog() {
           currentCC.setStatuses();
           window.pcube = currentCC;
       }
-  });
+    });
   });
 
   let currentConsentStatus = currentCC.exportCurrentStatuses();  
