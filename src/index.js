@@ -218,20 +218,46 @@ function blockUnblockScript(category, status) {
 
 function showDialog() {
   const param = dataParam;
-  const currentCC = new CPopup(param);
+  let currentCC = new CPopup(param);
   currentCC.setStatuses();
   if (currentCC.hasAnswered() !== true) {
       currentCC.open();
   }
   else {
+  }
   
-  } 
-  
-  currentCC.on( 'statusChanged', (p, a) => {
-    let part = p.split('_');
-    blockUnblockScript(part[part.length-1], a)
+  currentCC.on( 'statusChanged', (p, a, o, inst) => {
+    if (inst === currentCC) {
+      let part = p.split('_');
+      blockUnblockScript(part[part.length-1], a)
+    }
   });
-  
+
+  currentCC.on( 'cc-customize', () => {
+    currentCC.destroy();
+    const popupParam = {...dataParam};
+    popupParam.position = 'bottom-left';
+    popupParam.theme = 'edgeless';
+    popupParam.type = 'opt-in-detail';
+    popupParam.layout = 'detail';
+    const popupCC = new CPopup(popupParam);
+    popupCC.open();
+    popupCC.on( 'statusChanged', (p, a, o, inst) => {
+      if (inst === popupCC) {
+        let part = p.split('_');
+        blockUnblockScript(part[part.length-1], a);
+      }
+    });
+    popupCC.on( 'popupClosed', (inst) => {
+      if (inst === popupCC) {
+          inst.destroy();
+          currentCC = new CPopup(param);
+          currentCC.setStatuses();
+          window.pcube = currentCC;
+      }
+  });
+  });
+
   let currentConsentStatus = currentCC.exportCurrentStatuses();  
   if (currentConsentStatus) {
     globalConsentStatus = currentConsentStatus;

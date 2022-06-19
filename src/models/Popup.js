@@ -25,12 +25,11 @@ export default class Popup extends Base {
   constructor( options ) {
     super( defaultOptions, options )
     this.userCategories = {};
+    this.tmpUserCategories = {};
     Object.keys(categories).forEach((idx) => {
       this.userCategories[categories[idx]] = (categories[idx] === 'ESSENTIAL')?'ALLOW':'DISMISS';
+      this.tmpUserCategories[categories[idx]] = (categories[idx] === 'ESSENTIAL')?'ALLOW':'DISMISS';
     });
-
-    console.log(categories);
-    console.log(this.userCategories);
 
     const categoiesKey = Object.keys(this.userCategories);
     categoiesKey.forEach((categoryName, idx) => {
@@ -38,6 +37,7 @@ export default class Popup extends Base {
       const val = getCookie(cookieName);
       if (val === 'ALLOW' || val === 'DENY' || val === 'DISMISS')
         this.userCategories[categoryName] = val;
+        this.tmpUserCategories[categoryName] = val;
     });
 
     this.customStyles = {}
@@ -141,7 +141,7 @@ export default class Popup extends Base {
       if (showRevoke && this.options.revokable) {
         this.toggleRevokeButton(true)
       }
-      this.emit( "popupClosed" )
+      this.emit( "popupClosed", this )
     }
 
     return this
@@ -281,7 +281,7 @@ export default class Popup extends Base {
         const cookieName = name+'_'+categoryName
         const chosenBefore = statuses.indexOf( getCookie(cookieName) ) >= 0
         setCookie(cookieName, status, expiryDays, domain, path, secure)
-        this.emit( "statusChanged", cookieName, status, chosenBefore )
+        this.emit( "statusChanged", cookieName, status, chosenBefore, this )
       } else {
         this.clearStatuses()
       }
@@ -289,8 +289,10 @@ export default class Popup extends Base {
     if ( arguments.length === 0 ) {
       categories.forEach( category => updateCategoryStatus( category, this.userCategories[ category ] ) )
     } else if (arguments.length === 1){
-      categories.forEach( category => updateCategoryStatus( category, this.userCategories[ category ] ) )
-      //categories.forEach( category => updateCategoryStatus( category, arguments[ 0 ] ) )
+      if (arguments[0] === statusAllow) {
+        this.userCategories = this.tmpUserCategories;
+        categories.forEach( category => updateCategoryStatus( category, this.userCategories[ category ] ) );
+      }
     } else if ( arguments.length > 1 ) {
       arguments.forEach( ( categoryStatus, index ) => {
         updateCategoryStatus( this.userCategories[ index ], categoryStatus )
@@ -438,7 +440,8 @@ export default class Popup extends Base {
     el.addEventListener('click', event => this.handleButtonClick( event ) )
     el.querySelectorAll( '.cc-btn [type="checkbox"]' ).forEach( checkbox => {
       checkbox.addEventListener( 'change', () => {
-        this.userCategories[ checkbox.name ] = checkbox.checked ? 'ALLOW' : 'DENY'
+        //this.userCategories[ checkbox.name ] = checkbox.checked ? 'ALLOW' : 'DENY';
+        this.tmpUserCategories[ checkbox.name ] = checkbox.checked ? 'ALLOW' : 'DENY'
       });
       
       if (checkbox.name === 'ESSENTIAL') {
@@ -477,6 +480,12 @@ export default class Popup extends Base {
   handleButtonClick(event) {
     // returns the parent element with the specified class, or the original element - null if not found
     const btn = traverseDOMPath(event.target, 'cc-btn') || event.target
+
+    if (btn.classList.contains( 'cc-btn' ) && btn.classList.contains( 'cc-customize' )){
+      this.emit( "cc-customize" );
+      this.close(true);
+      return;
+    }
     
     if (btn.classList.contains( 'cc-btn' ) && btn.classList.contains( 'cc-save' )){
       this.setStatuses()
