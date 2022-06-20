@@ -22,14 +22,30 @@ import {
 } from "../utils"
 
 export default class Popup extends Base {
-  constructor( options ) {
-    super( defaultOptions, options )
+  constructor( options, categoryShow ) {
+    super( defaultOptions, options, categoryShow )
     this.userCategories = {};
     this.tmpUserCategories = {};
+    this.userCategoryShow = categoryShow;
     Object.keys(categories).forEach((idx) => {
       this.userCategories[categories[idx]] = (categories[idx] === 'ESSENTIAL')?'ALLOW':'DISMISS';
       this.tmpUserCategories[categories[idx]] = (categories[idx] === 'ESSENTIAL')?'ALLOW':'DISMISS';
     });
+
+    const userLocale = navigator.languages && navigator.languages.length
+    ? navigator.languages[0]
+    : navigator.language;
+
+    if (userLocale != "th-TH") {
+      this.options.content = options.lang.en;
+      this.setLang = 'en';
+    } else {
+      this.options.content = options.lang.th;
+      this.setLang = 'th';
+    }
+    
+    this.options.langEN = options.lang.en;
+    this.options.langTH = options.lang.th;
 
     const categoiesKey = Object.keys(this.userCategories);
     categoiesKey.forEach((categoryName, idx) => {
@@ -78,7 +94,7 @@ export default class Popup extends Base {
     // the full markup either contains the wrapper or it does not (for multiple instances)
     let cookiePopup = this.options.window
       .replace('{{classes}}', this.getPopupClasses().join(' '))
-      .replace('{{children}}', this.getPopupInnerMarkup())
+      .replace('{{children}}', this.getPopupInnerMarkup(this.setLang))
 
     // if user passes html, use it instead
     const customHTML = this.options.overrideHTML
@@ -383,25 +399,52 @@ export default class Popup extends Base {
     return classes
   }
 
-  getPopupInnerMarkup() {
+  getPopupInnerMarkup(lang) {
     const interpolated = {}
     const opts = this.options
 
     // removes link if showLink is false
     if (!opts.showLink) {
-      opts.elements.link = '' 
-      opts.elements.messagelink = opts.elements.message
+      if(lang == 'th'){
+        opts.elementsTh.link = ''
+        opts.elementsTh.messagelink = opts.elementsTh.message
+      }else{
+        opts.elementsEn.link = ''
+        opts.elementsEn.messagelink = opts.elementsEn.message
+      }
     }
 
-    Object.keys(opts.elements).forEach( prop => {
-      interpolated[prop] = interpolateString(
-        opts.elements[prop],
-        name => {
-          const str = opts.content[name]
-          return name && typeof str == 'string' && str.length ? str : ''
-        }
-      )
-    })
+    if(lang == 'th'){
+      Object.keys(opts.elementsTh).forEach(prop => {
+        interpolated[prop] = interpolateString(
+          opts.elementsTh[prop],
+          name => {
+            const str = opts.langTH[name]
+            return name && typeof str == 'string' && str.length ? str : ''
+          }
+        )
+      })
+    }else{
+      Object.keys(opts.elementsEn).forEach(prop => {
+        interpolated[prop] = interpolateString(
+          opts.elementsEn[prop],
+          name => {
+            const str = opts.langEN[name]
+            return name && typeof str == 'string' && str.length ? str : ''
+          }
+        )
+      })
+    }
+
+    // Object.keys(opts.elements).forEach( prop => {
+    //   interpolated[prop] = interpolateString(
+    //     opts.elements[prop],
+    //     name => {
+    //       const str = opts.content[name]
+    //       return name && typeof str == 'string' && str.length ? str : ''
+    //     }
+    //   )
+    // })
 
     // checks if the type is valid and defaults to info if it's not
     let complianceType = opts.compliance[opts.type]
@@ -437,7 +480,65 @@ export default class Popup extends Base {
 
     if (el.classList.contains('cc-window') && this.hasTransition) {
       el.classList.add('cc-invisible')
+
+      if(this.userCategoryShow != undefined){
+        el.querySelectorAll('#categories li').forEach (element => {
+          if(!(this.userCategoryShow.indexOf(element.getAttribute('name')) > -1)){
+            element.style.display = 'none';
+          }
+        });
+      }
     }
+
+    el.querySelectorAll('#lang').forEach(dropdown => {
+      dropdown.addEventListener('change', (event) => {
+        if (event.target.value == "th") {
+          this.options.content = opts.langTH;
+          this.setLang = 'th';
+          // localStorage.setItem('lang','th')
+        } else {
+          this.options.content = opts.langEN;
+          this.setLang = 'en';
+          // localStorage.setItem('lang','en')
+        }
+
+        this.destroy();
+
+
+        let cookiePopup = this.options.window
+          .replace('{{classes}}', this.getPopupClasses().join(' '))
+          .replace('{{children}}', this.getPopupInnerMarkup(this.setLang))
+          
+        // if user passes html, use it instead
+        const customHTML = this.options.overrideHTML
+        if (typeof customHTML == 'string' && customHTML.length) {
+          cookiePopup = customHTML
+        }
+
+        // if static, we need to grow the element from 0 height so it doesn't jump the page
+        // content. we wrap an element around it which will mask the hidden content
+
+        if (this.options.static) {
+          // `grower` is a wrapper div with a hidden overflow whose height is animated
+          const wrapper = this.appendMarkup(`<div class="cc-grower">${cookiePopup}</div>`)
+
+          wrapper.style.display = '' // set it to visible (because appendMarkup hides it)
+          this.element = wrapper.firstChild // get the `element` reference from the wrapper
+          this.element.style.display = 'none'
+          this.element.classList.add('cc-invisible')
+        } else {
+          this.element = this.appendMarkup(cookiePopup)
+        }
+
+        this.applyAutoDismiss()
+        this.applyRevokeButton()
+
+        if (this.options.autoOpen) {
+          this.autoOpen()
+        }
+
+      });
+    })
 
     el.addEventListener('click', event => this.handleButtonClick( event ) )
     el.querySelectorAll( '.cc-btn [type="checkbox"]' ).forEach( checkbox => {
