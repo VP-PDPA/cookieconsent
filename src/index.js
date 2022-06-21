@@ -7,14 +7,14 @@ import { v4 as uuidv4 } from 'uuid';
 import axios, {AxiosRequestConfig, AxiosPromise, Method} from 'axios';
 
 
-// export const dataHost = '___replace_dataHost___';
-// export const dataProjectId = '___replace_dataProjectId___';
-// export const dataSettingId = '___replace_dataSettingId___';
-// export const dataScanner =  JSON.parse('___replace_dataScanner___');
-// export const dataCookies =  JSON.parse('___replace_dataCookies___');
-// export const dataParam =  JSON.parse('___replace_dataParam___');
+export const dataHost = '___replace_dataHost___';
+export const dataProjectId = '___replace_dataProjectId___';
+export const dataSettingId = '___replace_dataSettingId___';
+export const dataScanner =  JSON.parse('___replace_dataScanner___');
+export const dataCookies =  JSON.parse('___replace_dataCookies___');
+export const dataParam =  JSON.parse('___replace_dataParam___');
 
-
+/*
 export const dataHost = 'http://localhost:8889/api/v1/endUserCookieConsent';
 export const dataProjectId = '8ee777d7-05a0-4290-9bd4-9af1b4a1d772';
 export const dataSettingId = '2ee2f247-e5db-41ef-a5bc-40894eefcae9';
@@ -129,7 +129,7 @@ export const dataParam =  {
   "type": "opt-in",
   //"layout": "detail"
 };
-
+*/
 
 function formatData() {
   let dataCookiesHash = {};
@@ -257,16 +257,29 @@ function onlyUnique(value, index, self) {
 function showDialog() {
   const param = dataParam;
 
+  const userLocale = navigator.languages && navigator.languages.length
+  ? navigator.languages[0]
+  : navigator.language;
+
+  if (userLocale === "th-TH")
+    param.selectedLang = 'th';
+  else
+    param.selectedLang = 'en';
+  
+  if (param.lang[param.selectedLang])
+    param.content = param.lang[param.selectedLang];
+
   const category = [];
   var categoryShow = [];
 
+  category.push('ESSENTIAL'); 
   dataScanner.forEach((key) => {
     category.push(key["category"].toUpperCase());
   });
 
   categoryShow = category.filter(onlyUnique);
 
-  let currentCC = new CPopup(param,categoryShow);
+  let currentCC = new CPopup(param, categoryShow);
   currentCC.setStatuses();
   if (currentCC.hasAnswered() !== true) {
       currentCC.open();
@@ -294,7 +307,7 @@ function showDialog() {
     popupParam.theme = 'edgeless';
     popupParam.type = 'opt-in-detail';
     popupParam.layout = 'detail';
-    const popupCC = new CPopup(popupParam);
+    const popupCC = new CPopup(popupParam, categoryShow);
     popupCC.open();
     popupCC.on( 'statusChanged', (p, a, o, inst) => {
       if (inst === popupCC) {
@@ -310,7 +323,7 @@ function showDialog() {
     popupCC.on( 'popupClosed', (inst) => {
       if (inst === popupCC) {
           inst.destroy();
-          currentCC = new CPopup(param);
+          currentCC = new CPopup(param, categoryShow);
           currentCC.setStatuses();
           window.pcube = currentCC;
       }

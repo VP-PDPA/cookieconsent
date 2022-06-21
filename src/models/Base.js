@@ -9,6 +9,8 @@ export default class Base {
   constructor( defaultOptions = {}, options = {} ){
     this.options = mergeOptions( defaultOptions, options )
     this.on = emitter.on.bind( emitter )
-    this.emit = emitter.emit.bind( emitter )
+    this.emit = emitter.emit.bind( emitter );
+    if(options.lang)
+      this.options.lang = options.lang;
   }
 }

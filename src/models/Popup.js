@@ -32,21 +32,6 @@ export default class Popup extends Base {
       this.tmpUserCategories[categories[idx]] = (categories[idx] === 'ESSENTIAL')?'ALLOW':'DISMISS';
     });
 
-    const userLocale = navigator.languages && navigator.languages.length
-    ? navigator.languages[0]
-    : navigator.language;
-
-    if (userLocale != "th-TH") {
-      this.options.content = options.lang.en;
-      this.setLang = 'en';
-    } else {
-      this.options.content = options.lang.th;
-      this.setLang = 'th';
-    }
-    
-    this.options.langEN = options.lang.en;
-    this.options.langTH = options.lang.th;
-
     const categoiesKey = Object.keys(this.userCategories);
     categoiesKey.forEach((categoryName, idx) => {
       const cookieName = this.options.cookie.name+'_'+categoryName
@@ -94,7 +79,8 @@ export default class Popup extends Base {
     // the full markup either contains the wrapper or it does not (for multiple instances)
     let cookiePopup = this.options.window
       .replace('{{classes}}', this.getPopupClasses().join(' '))
-      .replace('{{children}}', this.getPopupInnerMarkup(this.setLang))
+      .replace('{{children}}', this.getPopupInnerMarkup())
+      .replace('{{langOption}}', this.getSelectLangMarkup());
 
     // if user passes html, use it instead
     const customHTML = this.options.overrideHTML
@@ -399,52 +385,40 @@ export default class Popup extends Base {
     return classes
   }
 
-  getPopupInnerMarkup(lang) {
+  getSelectLangMarkup() {
+    let count = 0;
+    let interpolated = '<span style="margin:10px;display: flex;flex-direction: column;"><select style="width:40px;align-self: flex-end;" name="lang" id="lang">';
+    Object.keys(this.options.lang).forEach( prop => {
+      interpolated += `<option ${this.options.selectedLang===prop?'selected':''} value="${prop}">${prop.toUpperCase()}</option>`;
+      count++;
+    })
+    interpolated += '</select></span>';
+
+    if (count > 1)
+      return interpolated;
+    else
+      return '';
+  }
+
+  getPopupInnerMarkup() {
     const interpolated = {}
     const opts = this.options
 
     // removes link if showLink is false
     if (!opts.showLink) {
-      if(lang == 'th'){
-        opts.elementsTh.link = ''
-        opts.elementsTh.messagelink = opts.elementsTh.message
-      }else{
-        opts.elementsEn.link = ''
-        opts.elementsEn.messagelink = opts.elementsEn.message
-      }
+      opts.elements.link = '' 
+      opts.elements.messagelink = opts.elements.message
     }
 
-    if(lang == 'th'){
-      Object.keys(opts.elementsTh).forEach(prop => {
-        interpolated[prop] = interpolateString(
-          opts.elementsTh[prop],
-          name => {
-            const str = opts.langTH[name]
-            return name && typeof str == 'string' && str.length ? str : ''
-          }
-        )
-      })
-    }else{
-      Object.keys(opts.elementsEn).forEach(prop => {
-        interpolated[prop] = interpolateString(
-          opts.elementsEn[prop],
-          name => {
-            const str = opts.langEN[name]
-            return name && typeof str == 'string' && str.length ? str : ''
-          }
-        )
-      })
-    }
-
-    // Object.keys(opts.elements).forEach( prop => {
-    //   interpolated[prop] = interpolateString(
-    //     opts.elements[prop],
-    //     name => {
-    //       const str = opts.content[name]
-    //       return name && typeof str == 'string' && str.length ? str : ''
-    //     }
-    //   )
-    // })
+    Object.keys(opts.elements).forEach( prop => {
+      interpolated[prop] = interpolateString(
+        opts.elements[prop],
+        name => {
+          const str = opts.content[name]
+          return name && typeof str == 'string' && str.length ? str : ''
+        }
+      )
+    })
 
     // checks if the type is valid and defaults to info if it's not
     let complianceType = opts.compliance[opts.type]
@@ -492,22 +466,16 @@ export default class Popup extends Base {
 
     el.querySelectorAll('#lang').forEach(dropdown => {
       dropdown.addEventListener('change', (event) => {
-        if (event.target.value == "th") {
-          this.options.content = opts.langTH;
-          this.setLang = 'th';
-          // localStorage.setItem('lang','th')
-        } else {
-          this.options.content = opts.langEN;
-          this.setLang = 'en';
-          // localStorage.setItem('lang','en')
-        }
 
+        this.options.selectedLang = event.target.value;
+        if (this.options.lang[this.options.selectedLang])
+          this.options.content = this.options.lang[this.options.selectedLang];
         this.destroy();
-
-
+        
         let cookiePopup = this.options.window
           .replace('{{classes}}', this.getPopupClasses().join(' '))
-          .replace('{{children}}', this.getPopupInnerMarkup(this.setLang))
+          .replace('{{children}}', this.getPopupInnerMarkup())
+          .replace('{{langOption}}', this.getSelectLangMarkup());
           
         // if user passes html, use it instead
         const customHTML = this.options.overrideHTML
@@ -533,10 +501,7 @@ export default class Popup extends Base {
         this.applyAutoDismiss()
         this.applyRevokeButton()
 
-        if (this.options.autoOpen) {
-          this.autoOpen()
-        }
-
+        this.open();
       });
     })
 
