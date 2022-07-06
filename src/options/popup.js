@@ -17,7 +17,7 @@ export default {
     path: '/',
     // This is the domain that the cookie 'name' belongs to. The cookie can only be read on this domain.
     //  - Guide to cookie domains - https://www.mxsasha.eu/blog/2014/03/04/definitive-guide-to-cookie-domains/
-    domain: 'localhost',
+    //domain: 'localhost',
     // The cookies expire date, specified in days (specify -1 for no expiry)
     expiryDays: 365,
     // If true the cookie will be created with the secure flag. Secure cookies will only be transmitted via HTTPS.

@@ -387,12 +387,13 @@ export default class Popup extends Base {
 
   getSelectLangMarkup() {
     let count = 0;
-    let interpolated = '<span style="margin:10px;display: flex;flex-direction: column;"><select style="width:40px;align-self: flex-end;" name="lang" id="lang">';
+    let interpolated = '<span id="lang" style="margin-right:5px;margin-left:5px;display: flex;flex-direction: column;align-items: end">';
     Object.keys(this.options.lang).forEach( prop => {
-      interpolated += `<option ${this.options.selectedLang===prop?'selected':''} value="${prop}">${prop.toUpperCase()}</option>`;
+      if (this.options.selectedLang!==prop)
+        interpolated += `<a class="cc-link" href="#" data-lang="${prop}">${prop.toUpperCase()}</a>`;
       count++;
     })
-    interpolated += '</select></span>';
+    interpolated += '</span>';
 
     if (count > 1)
       return interpolated;
@@ -464,10 +465,9 @@ export default class Popup extends Base {
       }
     }
 
-    el.querySelectorAll('#lang').forEach(dropdown => {
-      dropdown.addEventListener('change', (event) => {
-
-        this.options.selectedLang = event.target.value;
+    el.querySelectorAll('#lang a').forEach(dropdown => {
+      dropdown.addEventListener('click', (event) => {
+        this.options.selectedLang = event.target.dataset.lang;
         if (this.options.lang[this.options.selectedLang])
           this.options.content = this.options.lang[this.options.selectedLang];
         this.destroy();
