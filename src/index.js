@@ -82,6 +82,7 @@ export const dataParam =  {
   "lang": {
       "en": {
           "allow": "Allow cookies",
+          "allowAll": "Allow All cookies",
           "header": "Cookies used on the website!",
           "customize": "Customize",
           "link": "Learn more",
@@ -93,6 +94,7 @@ export const dataParam =  {
       },
       "th": {
           "allow": "อนุญาติ",
+          "allowAll": "อนุญาติทั้งหมด",
           "header": "มีการใช้คุกกี้ที่เว็บไซต์นี้",
           "customize": "ปรับแต่ง",
           "link": "เรียนรู้เพิ่มเติม",
@@ -303,7 +305,7 @@ function showDialog() {
   currentCC.on( 'cc-customize', () => {
     currentCC.destroy();
     const popupParam = {...dataParam};
-    popupParam.position = 'bottom-left';
+    popupParam.position = 'full';
     popupParam.theme = 'edgeless';
     popupParam.type = 'opt-in-detail';
     popupParam.layout = 'detail';
