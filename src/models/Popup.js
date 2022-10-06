@@ -141,6 +141,7 @@ export default class Popup extends Base {
       } else {
         this.element.style.display = 'none'
       }
+      this.element.style.display = 'none'
 
       if (showRevoke && this.options.revokable) {
         this.toggleRevokeButton(true)
@@ -298,6 +299,14 @@ export default class Popup extends Base {
         categories.forEach( category => updateCategoryStatus( category, this.userCategories[ category ] ) );
         this.emit( "statusUpdated", this );
       }
+      else if (arguments[0] === 'allowall') {
+        Object.keys(categories).forEach((idx) => {
+          this.userCategories[categories[idx]] = 'ALLOW';
+          this.tmpUserCategories[categories[idx]] = 'ALLOW';
+        });
+        categories.forEach( category => updateCategoryStatus( category, this.userCategories[ category ] ) );
+        this.emit( "statusUpdated", this );
+      }
     } else if ( arguments.length > 1 ) {
       arguments.forEach( ( categoryStatus, index ) => {
         updateCategoryStatus( this.userCategories[ index ], categoryStatus )
@@ -396,8 +405,8 @@ export default class Popup extends Base {
     })
     interpolated += '</div>';
 
-    let final = `<div style='margin-right:5px;margin-left:5px;display: flex;flex-direction: row;align-items: start;justify-content:space-between'>
-                ${interpolated}<div style='margin-right:5px'></div></div>`
+    let final = `<div style='margin-right:5px;margin-left:5px;display: flex;flex-direction: row;align-items: start;justify-content:end'>
+                ${interpolated}</div>`
 
     if (count > 1)
       return final;
@@ -556,6 +565,12 @@ export default class Popup extends Base {
 
     if (btn.classList.contains( 'cc-btn' ) && btn.classList.contains( 'cc-customize' )){
       this.emit( "cc-customize" );
+      this.close(true);
+      return;
+    }
+
+    if (btn.classList.contains( 'cc-btn' ) && btn.classList.contains( 'cc-allowall' )){
+      this.setStatuses('allowall')
       this.close(true);
       return;
     }

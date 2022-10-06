@@ -56,7 +56,7 @@ export default {
     allow:
       `<a aria-label="allow cookies" role=button tabindex="0"  class="cc-btn cc-${statusAllow}">{{allow}}</a>`,
     allowAll:
-      `<a aria-label="allow all cookies" role=button tabindex="0"  class="cc-btn cc-${statusDismiss}">{{allowAll}}</a>`,
+      `<a aria-label="allow all cookies" role=button tabindex="0" class="cc-btn cc-allowall">{{allowAll}}</a>`,
     deny:
       `<a aria-label="deny cookies" role=button tabindex="0" class="cc-btn cc-${statusDeny}">{{deny}}</a>`,
     link:
@@ -94,7 +94,7 @@ export default {
   compliance: {
     info: '<div class="cc-compliance">{{dismiss}}</div>',
     'opt-in':
-      '<div class="cc-compliance cc-highlight">{{customize}}</div><div class="cc-compliance cc-highlight">{{allowAll}}{{allow}}</div>',
+      '<div class="cc-compliance cc-highlight"></div><div class="cc-compliance cc-highlight">{{customize}}{{allowAll}}{{allow}}</div>',
     'opt-out':
       '<div class="cc-compliance cc-highlight">{{customize}}</div><div class="cc-compliance cc-highlight">{{dismiss}}{{deny}}</div>',
     'opt-in-detail':

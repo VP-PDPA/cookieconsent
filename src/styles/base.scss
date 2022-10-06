@@ -143,13 +143,13 @@
   white-space: nowrap;
 }
 
-.cc-highlight .cc-btn:first-child {
+.cc-highlight .cc-btn:not(:last-child) {
   background-color: transparent;
   border-color: transparent;
 }
 
-.cc-highlight .cc-btn:first-child:hover,
-.cc-highlight .cc-btn:first-child:focus {
+.cc-highlight .cc-btn:not(:last-child):hover,
+.cc-highlight .cc-btn:not(:last-child):focus {
   background-color: transparent;
   text-decoration: underline;
 }
