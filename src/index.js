@@ -306,7 +306,7 @@ function showDialog() {
     currentCC.destroy();
     const popupParam = {...dataParam};
     popupParam.position = 'full';
-    popupParam.theme = 'edgeless';
+    popupParam.theme = 'classic';
     popupParam.type = 'opt-in-detail';
     popupParam.layout = 'detail';
     const popupCC = new CPopup(popupParam, categoryShow);
