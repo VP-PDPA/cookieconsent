@@ -77,7 +77,8 @@ export default class Popup extends Base {
     }
 
     // the full markup either contains the wrapper or it does not (for multiple instances)
-    let cookiePopup = this.options.window
+    let template = this.options.position==='full'?this.options.modal:this.options.window;
+    let cookiePopup = template
       .replace('{{classes}}', this.getPopupClasses().join(' '))
       .replace('{{children}}', this.getPopupInnerMarkup())
       .replace('{{langOption}}', this.getSelectLangMarkup());
@@ -387,16 +388,19 @@ export default class Popup extends Base {
 
   getSelectLangMarkup() {
     let count = 0;
-    let interpolated = '<span id="lang" style="margin-right:5px;margin-left:5px;display: flex;flex-direction: column;align-items: end">';
+    let interpolated = '<div id="lang" style="display: flex;flex-direction: row;align-items: start">';
     Object.keys(this.options.lang).forEach( prop => {
       if (this.options.selectedLang!==prop)
         interpolated += `<a class="cc-link" href="#" data-lang="${prop}">${prop.toUpperCase()}</a>`;
       count++;
     })
-    interpolated += '</span>';
+    interpolated += '</div>';
+
+    let final = `<div style='margin-right:5px;margin-left:5px;display: flex;flex-direction: row;align-items: start;justify-content:space-between'>
+                ${interpolated}<div style='margin-right:5px'></div></div>`
 
     if (count > 1)
-      return interpolated;
+      return final;
     else
       return '';
   }
@@ -453,7 +457,7 @@ export default class Popup extends Base {
 
     el.style.display = 'none'
 
-    if (el.classList.contains('cc-window') && this.hasTransition) {
+    if ((el.classList.contains('cc-window') || el.classList.contains('cc-modal')) && this.hasTransition) {
       el.classList.add('cc-invisible')
 
       if(this.userCategoryShow != undefined){
@@ -472,7 +476,8 @@ export default class Popup extends Base {
           this.options.content = this.options.lang[this.options.selectedLang];
         this.destroy();
         
-        let cookiePopup = this.options.window
+        let template = this.options.position==='full'?this.options.modal:this.options.window;
+        let cookiePopup = template
           .replace('{{classes}}', this.getPopupClasses().join(' '))
           .replace('{{children}}', this.getPopupInnerMarkup())
           .replace('{{langOption}}', this.getSelectLangMarkup());

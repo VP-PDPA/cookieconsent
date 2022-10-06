@@ -24,6 +24,10 @@ export const addCustomStylesheet = (id, palette, prefix) => {
           'color: ' + popup.text,
           'background-color: ' + popup.background,
       ]
+      colorStyles[prefix + '.cc-window2'] = [
+        'color: ' + popup.text,
+        'background-color: ' + popup.background,
+      ]
       colorStyles[prefix + '.cc-revoke'] = [
           'color: ' + popup.text,
           'background-color: ' + popup.background,

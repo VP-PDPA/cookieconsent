@@ -30,6 +30,7 @@ export default {
     message: 'This website uses cookies to ensure you get the best experience on our website.',
     dismiss: 'Dismiss',
     allow  : 'Allow cookies',
+    allowAll  : 'Allow all cookies',
     deny   : 'Decline',
     link   : 'Learn more',
     href   : 'https://www.cookiesandyou.com',
@@ -54,6 +55,8 @@ export default {
       `<a aria-label="dismiss cookie message" role=button tabindex="0" class="cc-btn cc-${statusDismiss}">{{dismiss}}</a>`,
     allow:
       `<a aria-label="allow cookies" role=button tabindex="0"  class="cc-btn cc-${statusAllow}">{{allow}}</a>`,
+    allowAll:
+      `<a aria-label="allow all cookies" role=button tabindex="0"  class="cc-btn cc-${statusDismiss}">{{allowAll}}</a>`,
     deny:
       `<a aria-label="deny cookies" role=button tabindex="0" class="cc-btn cc-${statusDeny}">{{deny}}</a>`,
     link:
@@ -81,7 +84,7 @@ export default {
   window:
     '<div role="dialog" aria-live="polite" aria-label="cookieconsent" aria-describedby="cookieconsent:desc" class="cc-window {{classes}}"><!--googleoff: all-->{{langOption}}{{children}}<!--googleon: all--></div>',
   
-  modal: '',
+  modal: '<div class="cc-modal"><div class="cc-modal-bg"></div><div role="dialog" aria-live="polite" aria-label="cookieconsent" aria-describedby="cookieconsent:desc" class="cc-window2 {{classes}}">{{langOption}}{{children}}</div></div>',
 
   // This is the html for the revoke button. This only shows up after the user has selected their level of consent
   // It can be enabled of disabled using the `revokable` option
@@ -91,11 +94,11 @@ export default {
   compliance: {
     info: '<div class="cc-compliance">{{dismiss}}</div>',
     'opt-in':
-      '<div class="cc-compliance cc-highlight">{{customize}}</div><div class="cc-compliance cc-highlight">{{dismiss}}{{allow}}</div>',
+      '<div class="cc-compliance cc-highlight">{{customize}}</div><div class="cc-compliance cc-highlight">{{allowAll}}{{allow}}</div>',
     'opt-out':
       '<div class="cc-compliance cc-highlight">{{customize}}</div><div class="cc-compliance cc-highlight">{{dismiss}}{{deny}}</div>',
     'opt-in-detail':
-      '<div class="form">{{categories}}</div><div class="cc-compliance cc-highlight">{{dismiss}}{{allow}}</div>',
+      '<div class="form">{{categories}}</div><div class="cc-compliance cc-highlight">{{allowAll}}{{allow}}</div>',
     'opt-out-detail':
       '<div class="form">{{categories}}</div><div class="cc-compliance cc-highlight">{{dismiss}}{{deny}}</div>',
     categories: '<div class="form">{{categories}}{{save}}</div>'

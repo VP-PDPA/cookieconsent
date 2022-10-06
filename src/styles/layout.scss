@@ -37,6 +37,10 @@
 .cc-bottom {
   bottom: 1em;
 }
+.cc-full {
+  max-width: 100% !important;  
+  margin: auto;
+}
 
 /* links that are direct decendants should be displayed as block */
 .cc-floating > .cc-link {
