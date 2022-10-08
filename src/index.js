@@ -90,7 +90,15 @@ export const dataParam =  {
           "message": "This website uses cookies to ensure you get the best experience on our website.",
           "policy": "Cookie Policy",
           "deny": "Decline",
-          "href": "https://www.google.com"
+          "href": "https://www.google.com",
+          "essential": "Essential",
+          "personalization": "Personalization",
+          "analytics": "Analytics",
+          "marketing": "Marketing",
+          "catessential": 'These cookies are essential for the website function, such as identifies and maintains user session, login authentication. These technical cookies are deleted after you quit your browser.',
+          "catpersonalization": 'These cookies are used for remembering and tracking user information and setting : these may include language preferences, the type of browser used to access services and the website, etc.',
+          "catanalytics": 'These cookies are used for internal research on how we can improve the service for all our users. These cookies help us to count the number of visitors and to see how visitors journey around the website.',
+          "catmarketing": 'These cookies are used to target advertising to user based on browsing activity, purchasing and the links that user have followed. We may also share this information with third parties for marketing purpose.'
       },
       "th": {
           "allow": "อนุญาติ",
@@ -102,7 +110,15 @@ export const dataParam =  {
           "message": "เว็บไซต์นี้มีการใช้านคุกกี้",
           "policy": "อ่านข้อมูลเพิ่มเติม",
           "deny": "ปฏิเสธ",
-          "href": "https://www.google.com"
+          "href": "https://www.google.com",
+          "essential": "พื้นฐาน (จำเป็นกับการใช้งาน)",
+          "personalization": "ปรับแต่งการทำงาน",
+          "analytics": "วิเคราะห์การใช้งาน",
+          "marketing": "การตลาด",
+          "catessential": 'คุกกี้ประเภทนี้มีความจำเป็นต่อการทำงานของเว็บไซต์ เพื่อให้เว็บไซต์สามารถทำงานได้เป็นปกติและมีความปลอดภัย เช่น การจัดการ Session, การตรวจสอบยืนยันตัวตนผู้ใช้งาน โดยคุกกี้ประเภทนี้จะถูกลบเมื่อผู้ใช้งานปิดบราวเซอร์',
+          "catpersonalization": 'คุกกี้ประเภทนี้ใช้ในการจดจำข้อมูลการตั้งค่า หรือตัวเลือกที่ผู้ใช้เคยเลือกไว้บนเว็บไซต์ เช่น ภาษาที่แสดงบนเว็บไซต์ เพื่อให้ผู้ใช้สามารถใช้งานเว็บไซต์ได้สะดวกยิ่งขึ้น โดยไม่ต้องให้ข้อมูล หรือตั้งค่าใหม่ทุกครั้ง',
+          "catanalytics": 'คุกกี้ประเภทนี้จะเก็บข้อมูลการใช้งานเว็บไซต์ของผู้ใช้ เพื่อใช้ในการปรับปรุง พัฒนา เนื้อหา และการบริการ เพื่อเพิ่มประสบการณ์ที่ดีในการใช้เว็บไซต์',
+          "catmarketing": 'คุกกี้ประเภทนี้จะใช้ในการนำเสนอเนื้อหา บริการ และโฆษณาที่เกี่ยวข้องกับความสนใจของผู้ใช้ โดยใช้ข้อมูลที่มีการเก็บบนบราวเซอร์ เช่น การเข้าชมเว็บไซต์ การซื้อสินค้า หรือบริการ เรายังอาจแชร์ข้อมูลนี้กับบุคคลที่สามเพื่อวัตถุประสงค์ทางการตลาด'
       }
   },
   "content": {
@@ -114,8 +130,17 @@ export const dataParam =  {
       "message": "This website uses cookies to ensure you get the best experience on our website.",
       "policy": "Cookie Policy",
       "deny": "Decline",
-      "href": "https://www.google.com"
+      "href": "https://www.google.com",
+      "essential": "Essential",
+      "personalization": "Personalization",
+      "analytics": "Analytics",
+      "marketing": "Marketing",
+      "catessential": 'These cookies are essential for the website function, such as identifies and maintains user session, login authentication. These technical cookies are deleted after you quit your browser.',
+      "catpersonalization": 'These cookies are used for remembering and tracking user information and setting : these may include language preferences, the type of browser used to access services and the website, etc.',
+      "catanalytics": 'These cookies are used for internal research on how we can improve the service for all our users. These cookies help us to count the number of visitors and to see how visitors journey around the website.',
+      "catmarketing": 'These cookies are used to target advertising to user based on browsing activity, purchasing and the links that user have followed. We may also share this information with third parties for marketing purpose.'
   },
+  "selectedLang": "en",
   "palette": {
       "popup": {
           "background": "#3937A3FF",
@@ -132,7 +157,6 @@ export const dataParam =  {
   //"layout": "detail"
 };
 */
-
 function formatData() {
   let dataCookiesHash = {};
   for (let i=0; i<dataCookies.length; i++) {
@@ -156,7 +180,7 @@ function initCookie() {
       },
       set: function () {
           let name = arguments[0].split(';')[0].split('=')[0];
-          if (name.indexOf('cookieconsent_status') === -1 && name.indexOf('pcube_id') === -1) {
+          if (name.indexOf('cookieconsent_status') === -1 && name.indexOf('pcube_cc') === -1) {
             let cinfo = dataCookiesHash[name];
             if (!cinfo || globalConsentStatus[cinfo.category.toUpperCase()] !== 'ALLOW') {
               globalCookieStorage[name] = arguments;
@@ -227,10 +251,13 @@ function blockUnblockScript(category, status) {
   }
 };
 
-let cookieId = getCookie('pcube_id');
-const currentUuid = cookieId===undefined?uuidv4():cookieId;
+let cookieId = getCookie('pcube_cc');
+const currentUuid = cookieId===undefined?uuidv4():cookieId.id;
 if (cookieId === undefined)
-  setCookie('pcube_id', currentUuid, 365);
+  setCookie('pcube_cc', JSON.stringify({
+    id: currentUuid, 
+    selectedLang: dataParam.selectedLang
+  }), 365);
 
 function sendConsent(inst) {
   let status = inst.getStatuses();

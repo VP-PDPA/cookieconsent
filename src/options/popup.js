@@ -37,7 +37,15 @@ export default {
     close  : '&#x274c',
     target : '_blank',
     policy : 'Cookie Policy',
-    customize: 'Customize'
+    customize: 'Customize',
+    essential: "Essential",
+    personalization: "Personalization",
+    analytics: "Analytics",
+    marketing: "Marketing",
+    catessential: 'These cookies are essential for the website function, such as identifies and maintains user session, login authentication. These technical cookies are deleted after you quit your browser.',
+    catpersonalization: 'These cookies are used for remembering and tracking user information and setting : these may include language preferences, the type of browser used to access services and the website, etc.',
+    catanalytics: 'These cookies are used for internal research on how we can improve the service for all our users. These cookies help us to count the number of visitors and to see how visitors journey around the website.',
+    catmarketing: 'These cookies are used to target advertising to user based on browsing activity, purchasing and the links that user have followed. We may also share this information with third parties for marketing purpose.'
   },
 
   // This is the HTML for the elements above. The string {{header}} will be replaced with the equivalent text below.
@@ -63,13 +71,14 @@ export default {
       '<a aria-label="learn more about cookies" role=button tabindex="0" class="cc-link" href="{{href}}" rel="noopener noreferrer nofollow" target="{{target}}">{{link}}</a>',
     close:
       '<span aria-label="dismiss cookie message" role=button tabindex="0" class="cc-close">{{close}}</span>',
-      categories: '<ul class="cc-categories" id="categories">' +
+    categories: '<ul class="cc-categories" id="categories">' +
       categories.map( ( category, index ) =>
-        `<li class="cc-category cc-highlight" style="height:30px;" name=${category}>
-          <button class="cc-btn" tabindex="0"><input style="height:21px;margin-top:0px;margin-bottom:0px;" type="checkbox" name="${category}"/><span class="cc-btn-checkbox"></span>${category}</button>
-          <div class="cc-tooltip">
-            <p>This is the category for cookies that don't fit the '${category.toLowerCase()}' category.</p>
-          </div>
+        `<li class="cc-category cc-highlight" style="margin-bottom:5px;" name=${category}>
+          <button class="cc-btn" tabindex="0">
+            <input style="height:21px;margin-top:0px;margin-bottom:0px;margin-right:5px;" type="checkbox" name="${category}"/>
+            <div class="cc-btn-checkbox" style="padding-top:2px;padding-left:5px;font-weight: bold;" data-cat="${category}">{{${category.toLowerCase()}}}</div>
+          </button>
+          <div style="margin-left:15px;font-weight: normal;">{{cat${category.toLowerCase()}}}</div>
         </li>`
       ).join("")
       + '</ul>',
@@ -100,8 +109,8 @@ export default {
     'opt-in-detail':
       '<div class="form">{{categories}}</div><div class="cc-compliance cc-highlight">{{allowAll}}{{allow}}</div>',
     'opt-out-detail':
-      '<div class="form">{{categories}}</div><div class="cc-compliance cc-highlight">{{dismiss}}{{deny}}</div>',
-    categories: '<div class="form">{{categories}}{{save}}</div>'
+      '<div class="form">{{categories}}</div><div class="cc-compliance cc-highlight">{{dismiss}}{{deny}}</div>'
+    //categories: '<div class="form">{{categories}}{{save}}</div>'
   },
 
   // select your type of popup here

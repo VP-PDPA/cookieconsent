@@ -24,6 +24,14 @@ import {
 export default class Popup extends Base {
   constructor( options, categoryShow ) {
     super( defaultOptions, options, categoryShow )
+
+    let pcube_cc = getCookie('pcube_cc');
+    if (pcube_cc) {
+      pcube_cc = JSON.parse(pcube_cc);
+      this.options.selectedLang = pcube_cc.selectedLang;
+      this.options.content = this.options.lang[this.options.selectedLang];
+    }
+   
     this.userCategories = {};
     this.tmpUserCategories = {};
     this.userCategoryShow = categoryShow;
@@ -481,8 +489,18 @@ export default class Popup extends Base {
     el.querySelectorAll('#lang a').forEach(dropdown => {
       dropdown.addEventListener('click', (event) => {
         this.options.selectedLang = event.target.dataset.lang;
-        if (this.options.lang[this.options.selectedLang])
+        let pcube_cc = getCookie('pcube_cc');
+        if (pcube_cc) {
+          pcube_cc = JSON.parse(pcube_cc);
+          setCookie('pcube_cc', JSON.stringify({
+            id: pcube_cc.id, 
+            selectedLang: this.options.selectedLang
+          }), 365);
+        }
+
+        if (this.options.lang[this.options.selectedLang]) {
           this.options.content = this.options.lang[this.options.selectedLang];
+        }
         this.destroy();
         
         let template = this.options.position==='full'?this.options.modal:this.options.window;
@@ -534,7 +552,24 @@ export default class Popup extends Base {
         checkbox.addEventListener( 'click', event => (event.stopPropagation()) )
         checkbox.checked = this.userCategories[ checkbox.name ] === 'ALLOW';
       }
+    });
+    el.querySelectorAll( '.cc-btn-checkbox' ).forEach( checkbox => {
+
+      if (checkbox.dataset.cat === 'ESSENTIAL') {
+      }
+      else {
+        checkbox.addEventListener( 'click', event => {
+          el.querySelectorAll( '.cc-btn [type="checkbox"]' ).forEach( chk => {
+            if (chk.name === checkbox.dataset.cat) {
+              chk.checked = !chk.checked;
+              this.tmpUserCategories[ chk.name ] = chk.checked ? 'ALLOW' : 'DENY';
+            }
+          });
+        })
+
+      }
     })
+
     el.querySelectorAll(".cc-info").forEach( showInfo => {
       showInfo.addEventListener('mousedown', function ( event ) {
         if ( this === document.activeElement  ) {
