@@ -52,7 +52,8 @@ export const addCustomStylesheet = (id, palette, prefix) => {
 
           if (button.background != 'transparent') {
               colorStyles[prefix + ' .cc-btn:hover, ' + prefix + ' .cc-btn:focus'] = [
-                  'background-color: ' + (button.hover || getHoverColor(button.background)),
+                  'background-color: ' + (getHoverColor(button.background)),
+                  //'color:' + button.background
               ]
           }
 
@@ -62,11 +63,11 @@ export const addCustomStylesheet = (id, palette, prefix) => {
                   ? highlight.text
                   : getContrast(highlight.background);
               highlight.border = highlight.border ? highlight.border : 'transparent';
-              colorStyles[prefix + ' .cc-highlight .cc-btn:first-child'] = [
+              /*colorStyles[prefix + ' .cc-highlight .cc-btn:first-child'] = [
                   'color: ' + highlight.text,
                   'border-color: ' + highlight.border,
                   'background-color: ' + highlight.background,
-              ]
+              ]*/
           } else {
               // sets highlight text color to popup text. background and border are transparent by default.
               colorStyles[prefix + ' .cc-highlight .cc-btn:first-child'] = [

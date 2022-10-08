@@ -32,7 +32,7 @@ export const getLuminance = hex => {
     .slice(1)
 }
 export const getHoverColor = hex => {
-  hex = normalizeHex( hex )
+  hex = normalizeHex( hex ).substr(0, 6);
   // for black buttons
   return hex === '000000' ? '#222' : getLuminance( hex )
 }
