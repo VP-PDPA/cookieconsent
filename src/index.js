@@ -82,7 +82,7 @@ export const dataParam =  {
   "lang": {
       "en": {
           "allow": "Allow cookies",
-          "allowAll": "Allow All cookies",
+          "allowall": "Allow All cookies",
           "header": "Cookies used on the website!",
           "customize": "Customize",
           "link": "Learn more",
@@ -102,7 +102,7 @@ export const dataParam =  {
       },
       "th": {
           "allow": "อนุญาติ",
-          "allowAll": "อนุญาติทั้งหมด",
+          "allowall": "อนุญาติทั้งหมด",
           "header": "มีการใช้คุกกี้ที่เว็บไซต์นี้",
           "customize": "ปรับแต่ง",
           "link": "เรียนรู้เพิ่มเติม",
@@ -123,6 +123,7 @@ export const dataParam =  {
   },
   "content": {
       "allow": "Allow cookies",
+      "allowall": "Allow All cookies",
       "header": "Cookies used on the website!",
       "customize": "Customize",
       "link": "Learn more",

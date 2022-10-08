@@ -30,7 +30,7 @@ export default {
     message: 'This website uses cookies to ensure you get the best experience on our website.',
     dismiss: 'Dismiss',
     allow  : 'Allow cookies',
-    allowAll  : 'Allow all cookies',
+    allowall  : 'Allow all cookies',
     deny   : 'Decline',
     link   : 'Learn more',
     href   : 'https://www.cookiesandyou.com',
@@ -63,8 +63,8 @@ export default {
       `<a aria-label="dismiss cookie message" role=button tabindex="0" class="cc-btn cc-${statusDismiss}">{{dismiss}}</a>`,
     allow:
       `<a aria-label="allow cookies" role=button tabindex="0"  class="cc-btn cc-${statusAllow}">{{allow}}</a>`,
-    allowAll:
-      `<a aria-label="allow all cookies" role=button tabindex="0" class="cc-btn cc-allowall">{{allowAll}}</a>`,
+    allowall:
+      `<a aria-label="allow all cookies" role=button tabindex="0" class="cc-btn cc-allowall">{{allowall}}</a>`,
     deny:
       `<a aria-label="deny cookies" role=button tabindex="0" class="cc-btn cc-${statusDeny}">{{deny}}</a>`,
     link:
@@ -76,7 +76,7 @@ export default {
         `<li class="cc-category cc-highlight" style="margin-bottom:5px;" name=${category}>
           <button class="cc-btn" style="height:40px" tabindex="0">
             <input style="height:21px;width:21px;margin-top:4px;" type="checkbox" name="${category}"/>
-            <div class="cc-btn-checkbox" style="font-weight: bold;margin-left:5px;" data-cat="${category}">{{${category.toLowerCase()}}}</div>
+            <div class="cc-btn-checkbox" style="font-weight: bold;margin-left:10px;margin-top:2px;" data-cat="${category}">{{${category.toLowerCase()}}}</div>
           </button>
           <div style="margin-left:15px;font-weight: normal;">{{cat${category.toLowerCase()}}}</div>
         </li>`
@@ -103,11 +103,11 @@ export default {
   compliance: {
     info: '<div class="cc-compliance">{{dismiss}}</div>',
     'opt-in':
-      '<div class="cc-compliance cc-highlight"></div><div class="cc-compliance cc-highlight">{{customize}}{{allowAll}}{{allow}}</div>',
+      '<div class="cc-compliance cc-highlight"></div><div class="cc-compliance cc-highlight">{{customize}}{{allowall}}{{allow}}</div>',
     'opt-out':
       '<div class="cc-compliance cc-highlight">{{customize}}</div><div class="cc-compliance cc-highlight">{{dismiss}}{{deny}}</div>',
     'opt-in-detail':
-      '<div class="form">{{categories}}</div><div class="cc-compliance cc-highlight">{{allowAll}}{{allow}}</div>',
+      '<div class="form">{{categories}}</div><div class="cc-compliance cc-highlight">{{allowall}}{{allow}}</div>',
     'opt-out-detail':
       '<div class="form">{{categories}}</div><div class="cc-compliance cc-highlight">{{dismiss}}{{deny}}</div>'
     //categories: '<div class="form">{{categories}}{{save}}</div>'
