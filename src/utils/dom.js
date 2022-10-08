@@ -16,6 +16,9 @@ export const addCustomStylesheet = (id, palette, prefix) => {
       // assumes popup.background is set
       popup.text = popup.text ? popup.text : getContrast(popup.background)
       popup.link = popup.link ? popup.link : popup.text
+      colorStyles[prefix + ' .cc-btn, ' + prefix + ' [type="checkbox"]'] = [
+        'color: ' + button.background,
+      ]
       colorStyles[prefix + ' .cc-tooltip, ' + prefix + ' .cc-tooltip:after'] = [
           'color: ' + popup.text,
           'background-color: ' + popup.background,
