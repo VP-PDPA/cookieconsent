@@ -25,11 +25,13 @@ export default class Popup extends Base {
   constructor( options, categoryShow ) {
     super( defaultOptions, options, categoryShow )
 
+    this.myId = new Date().getTime();
     let pcube_cc = getCookie('pcube_cc');
     if (pcube_cc) {
       pcube_cc = JSON.parse(pcube_cc);
       this.options.selectedLang = pcube_cc.selectedLang;
-      this.options.content = this.options.lang[this.options.selectedLang];
+      if (this.options.lang[this.options.selectedLang] !== undefined)
+        this.options.content = this.options.lang[this.options.selectedLang];
     }
    
     this.userCategories = {};
@@ -599,7 +601,7 @@ export default class Popup extends Base {
     const btn = traverseDOMPath(event.target, 'cc-btn') || event.target
 
     if (btn.classList.contains( 'cc-btn' ) && btn.classList.contains( 'cc-customize' )){
-      this.emit( "cc-customize" );
+      this.emit( "cc-customize", this.myId );
       this.close(true);
       return;
     }
