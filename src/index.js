@@ -310,7 +310,7 @@ function showDialog() {
   categoryShow = category.filter(onlyUnique);
 
   let currentCC = new CPopup(param, categoryShow);
-  currentCC.setStatuses();
+  //currentCC.setStatuses();
   if (currentCC.hasAnswered() !== true) {
       currentCC.open();
   }
