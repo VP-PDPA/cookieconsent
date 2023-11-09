@@ -10,10 +10,17 @@
   line-height: 1.5em;
 
   display: flex;
-  flex-wrap: nowrap;
+  // flex-wrap: nowrap;
+  flex-wrap: wrap; /** For wrapping the full-width powered-by message new row */
 
   /* the following are random unjustified styles - just because - should probably be removed */
   z-index: 9998;
+}
+
+.cc-powered-by {
+  display: flex;
+  width: 100%;
+  font-size: 12px;
 }
 
 .cc-modal {
