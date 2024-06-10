@@ -1,6 +1,6 @@
 "use strict"
 
-import { statusDeny, statusAllow, statusDismiss, categories }  from "../constants/index.js"
+import { statusDeny, statusAllow, statusDismiss, categories, POWERED_BY_MESSAGE }  from "../constants/index.js"
 
 export default {
   // if false, this prevents the popup from showing (useful for giving to control to another piece of code)
@@ -90,10 +90,25 @@ export default {
   // The placeholders {{classes}} and {{children}} both get replaced during initialisation:
   //  - {{classes}} is where additional classes get added
   //  - {{children}} is where the HTML children are placed
-  window:
-    '<div role="dialog" aria-live="polite" aria-label="cookieconsent" aria-describedby="cookieconsent:desc" class="cc-window {{classes}}"><!--googleoff: all-->{{langOption}}{{children}}<!--googleon: all--></div>',
-  
-  modal: '<div class="cc-modal"><div class="cc-modal-bg"></div><div role="dialog" aria-live="polite" aria-label="cookieconsent" aria-describedby="cookieconsent:desc" class="cc-window2 {{classes}}">{{langOption}}{{children}}</div></div>',
+  window: `
+    <div role="dialog" aria-live="polite" aria-label="cookieconsent" aria-describedby="cookieconsent:desc" class="cc-window {{classes}}">
+      <!--googleoff: all-->
+      {{langOption}}
+      {{children}}
+      <!--googleon: all-->
+      <div class="cc-powered-by">${POWERED_BY_MESSAGE}</div>
+    </div>
+  `,
+  modal: `
+    <div class="cc-modal">
+      <div class="cc-modal-bg"></div>
+      <div role="dialog" aria-live="polite" aria-label="cookieconsent" aria-describedby="cookieconsent:desc" class="cc-window2 {{classes}}">
+        {{langOption}}
+        {{children}}
+        <div class="cc-powered-by">${POWERED_BY_MESSAGE}</div>
+      </div>
+    </div>
+  `,
 
   // This is the html for the revoke button. This only shows up after the user has selected their level of consent
   // It can be enabled of disabled using the `revokable` option
