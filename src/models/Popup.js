@@ -297,7 +297,6 @@ export default class Popup extends Base {
    */
   setStatuses() {
     const { name, expiryDays, domain, path, secure } = this.options.cookie;
-
     const updateCategoryStatus = (categoryName, status) => {
       if (isValidStatus(status)) {
         const cookieName = name + "_" + categoryName;
@@ -308,30 +307,57 @@ export default class Popup extends Base {
         //this.clearStatuses()
       }
     };
+    // if (arguments.length === 0) {
+    //   categories.forEach((category) =>
+    //     updateCategoryStatus(category, this.userCategories[category])
+    //   );
+    // } else if (arguments.length === 1) {
+    //   if (arguments[0] === statusAllow) {
+    //     this.userCategories = this.tmpUserCategories;
+    //     categories.forEach((category) =>
+    //       updateCategoryStatus(category, this.userCategories[category])
+    //     );
+    //     this.emit("statusUpdated", this);
+    //   } else if (arguments[0] === "allowall") {
+    //     Object.keys(categories).forEach((idx) => {
+    //       this.userCategories[categories[idx]] = "ALLOW";
+    //       this.tmpUserCategories[categories[idx]] = "ALLOW";
+    //     });
+    //     categories.forEach((category) =>
+    //       updateCategoryStatus(category, this.userCategories[category])
+    //     );
+    //     this.emit("statusUpdated", this);
+    //   }
+    // } else if (arguments.length > 1) {
+    //   arguments.forEach((categoryStatus, index) => {
+    //     updateCategoryStatus(this.userCategories[index], categoryStatus);
+    //   });
+    // }
+
     if (arguments.length === 0) {
-      categories.forEach((category) =>
-        updateCategoryStatus(category, this.userCategories[category])
-      );
+      this.userCategoryShow.forEach((category) => {
+        updateCategoryStatus(category, this.userCategories[category]);
+      });
     } else if (arguments.length === 1) {
       if (arguments[0] === statusAllow) {
         this.userCategories = this.tmpUserCategories;
-        categories.forEach((category) =>
-          updateCategoryStatus(category, this.userCategories[category])
-        );
+        this.userCategoryShow.forEach((category) => {
+          updateCategoryStatus(category, this.userCategories[category]);
+        });
         this.emit("statusUpdated", this);
       } else if (arguments[0] === "allowall") {
-        Object.keys(categories).forEach((idx) => {
-          this.userCategories[categories[idx]] = "ALLOW";
-          this.tmpUserCategories[categories[idx]] = "ALLOW";
+        this.userCategoryShow.forEach((category) => {
+          this.userCategories[category] = "ALLOW";
+          this.tmpUserCategories[category] = "ALLOW";
         });
-        categories.forEach((category) =>
-          updateCategoryStatus(category, this.userCategories[category])
-        );
+        this.userCategoryShow.forEach((category) => {
+          updateCategoryStatus(category, this.userCategories[category]);
+        });
         this.emit("statusUpdated", this);
       }
     } else if (arguments.length > 1) {
       arguments.forEach((categoryStatus, index) => {
-        updateCategoryStatus(this.userCategories[index], categoryStatus);
+        updateCategoryStatus(this.userCategoryShow[index], categoryStatus);
       });
     }
   }
