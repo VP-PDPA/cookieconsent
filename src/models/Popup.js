@@ -1,13 +1,8 @@
-"use strict"
+"use strict";
 
-import Base from "./Base"
-import defaultOptions from "../options/popup"
-import {
-  categories,
-  statuses,
-  statusDismiss,
-  statusAllow
-} from "../constants"
+import Base from "./Base";
+import defaultOptions from "../options/popup";
+import { categories, statuses, statusDismiss, statusAllow } from "../constants";
 import {
   addCustomStylesheet,
   getCookie,
@@ -19,169 +14,177 @@ import {
   setCookie,
   throttle,
   traverseDOMPath,
-} from "../utils"
+} from "../utils";
 
 export default class Popup extends Base {
-  constructor( options, categoryShow ) {
-    super( defaultOptions, options, categoryShow )
+  constructor(options, categoryShow) {
+    super(defaultOptions, options, categoryShow);
 
     this.myId = new Date().getTime();
-    let pcube_cc = getCookie('pcube_cc');
+    let pcube_cc = getCookie("pcube_cc");
     if (pcube_cc) {
       pcube_cc = JSON.parse(pcube_cc);
       this.options.selectedLang = pcube_cc.selectedLang;
       if (this.options.lang[this.options.selectedLang] !== undefined)
         this.options.content = this.options.lang[this.options.selectedLang];
     }
-   
+
     this.userCategories = {};
     this.tmpUserCategories = {};
     this.userCategoryShow = categoryShow;
     Object.keys(categories).forEach((idx) => {
-      this.userCategories[categories[idx]] = (categories[idx] === 'ESSENTIAL')?'ALLOW':'DISMISS';
-      this.tmpUserCategories[categories[idx]] = (categories[idx] === 'ESSENTIAL')?'ALLOW':'DISMISS';
+      this.userCategories[categories[idx]] =
+        categories[idx] === "ESSENTIAL" ? "ALLOW" : "DISMISS";
+      this.tmpUserCategories[categories[idx]] =
+        categories[idx] === "ESSENTIAL" ? "ALLOW" : "DISMISS";
     });
 
     const categoiesKey = Object.keys(this.userCategories);
     categoiesKey.forEach((categoryName, idx) => {
-      const cookieName = this.options.cookie.name+'_'+categoryName
+      const cookieName = this.options.cookie.name + "_" + categoryName;
       const val = getCookie(cookieName);
-      if (val === 'ALLOW' || val === 'DENY' || val === 'DISMISS')
+      if (val === "ALLOW" || val === "DENY" || val === "DISMISS")
         this.userCategories[categoryName] = val;
-        this.tmpUserCategories[categoryName] = val;
+      this.tmpUserCategories[categoryName] = val;
     });
 
-    this.customStyles = {}
-    this.hasTransition = !!(function() {
-      const el = document.createElement('div')
+    this.customStyles = {};
+    this.hasTransition = !!(function () {
+      const el = document.createElement("div");
       const trans = {
-        t: 'transitionend',
-        OT: 'oTransitionEnd',
-        msT: 'MSTransitionEnd',
-        MozT: 'transitionend',
-        WebkitT: 'webkitTransitionEnd'
-      }
-  
+        t: "transitionend",
+        OT: "oTransitionEnd",
+        msT: "MSTransitionEnd",
+        MozT: "transitionend",
+        WebkitT: "webkitTransitionEnd",
+      };
+
       for (let prefix in trans) {
         if (
           trans.hasOwnProperty(prefix) &&
-          typeof el.style[prefix + 'ransition'] !== 'undefined'
+          typeof el.style[prefix + "ransition"] !== "undefined"
         ) {
-          return trans[prefix]
+          return trans[prefix];
         }
       }
-      return ''
-    })()
+      return "";
+    })();
 
     // returns true if `onComplete` was called
     if (this.canUseCookies()) {
       // user has already answered
-      this.options.enabled = false
+      this.options.enabled = false;
     }
     // apply blacklist / whitelist
     if (this.options.blacklistPage.includes(location.pathname)) {
-      this.options.enabled = false
+      this.options.enabled = false;
     }
     if (this.options.whitelistPage.includes(location.pathname)) {
-      this.options.enabled = true
+      this.options.enabled = true;
     }
 
     // the full markup either contains the wrapper or it does not (for multiple instances)
-    let template = this.options.position==='full'?this.options.modal:this.options.window;
+    let template =
+      this.options.position === "full"
+        ? this.options.modal
+        : this.options.window;
     let cookiePopup = template
-      .replace('{{classes}}', this.getPopupClasses().join(' '))
-      .replace('{{children}}', this.getPopupInnerMarkup())
-      .replace('{{langOption}}', this.getSelectLangMarkup());
+      .replace("{{classes}}", this.getPopupClasses().join(" "))
+      .replace("{{children}}", this.getPopupInnerMarkup())
+      .replace("{{langOption}}", this.getSelectLangMarkup());
 
     // if user passes html, use it instead
-    const customHTML = this.options.overrideHTML
-    if (typeof customHTML == 'string' && customHTML.length ) {
-      cookiePopup = customHTML
+    const customHTML = this.options.overrideHTML;
+    if (typeof customHTML == "string" && customHTML.length) {
+      cookiePopup = customHTML;
     }
 
     // if static, we need to grow the element from 0 height so it doesn't jump the page
     // content. we wrap an element around it which will mask the hidden content
-    
+
     if (this.options.static) {
       // `grower` is a wrapper div with a hidden overflow whose height is animated
-      const wrapper = this.appendMarkup(`<div class="cc-grower">${cookiePopup}</div>`)
+      const wrapper = this.appendMarkup(
+        `<div class="cc-grower">${cookiePopup}</div>`
+      );
 
-      wrapper.style.display = '' // set it to visible (because appendMarkup hides it)
-      this.element = wrapper.firstChild // get the `element` reference from the wrapper
-      this.element.style.display = 'none'
-      this.element.classList.add('cc-invisible')
+      wrapper.style.display = ""; // set it to visible (because appendMarkup hides it)
+      this.element = wrapper.firstChild; // get the `element` reference from the wrapper
+      this.element.style.display = "none";
+      this.element.classList.add("cc-invisible");
     } else {
-      this.element = this.appendMarkup(cookiePopup)
+      this.element = this.appendMarkup(cookiePopup);
     }
 
-    this.applyAutoDismiss()
-    this.applyRevokeButton()
+    this.applyAutoDismiss();
+    this.applyRevokeButton();
 
     if (this.options.autoOpen) {
-      this.autoOpen()
+      this.autoOpen();
     }
   }
 
   open() {
-    if (!this.element) return
+    if (!this.element) return;
 
     this.tmpUserCategories = this.userCategories;
     if (!this.isOpen()) {
       if (this.hasTransition) {
-        this.fadeIn()
+        this.fadeIn();
       } else {
-        this.element.style.display = ''
+        this.element.style.display = "";
       }
 
       if (this.options.revokable) {
-        this.toggleRevokeButton()
+        this.toggleRevokeButton();
       }
-      this.emit( "popupOpened" )
+      this.emit("popupOpened");
     }
 
-    return this
+    return this;
   }
 
-  close( showRevoke ) {
-    if (!this.element) return
-    
+  close(showRevoke) {
+    if (!this.element) return;
+
     if (this.isOpen()) {
       if (this.hasTransition) {
-        this.fadeOut()
+        this.fadeOut();
       } else {
-        this.element.style.display = 'none'
+        this.element.style.display = "none";
       }
-      this.element.style.display = 'none'
+      this.element.style.display = "none";
 
       if (showRevoke && this.options.revokable) {
-        this.toggleRevokeButton(true)
+        this.toggleRevokeButton(true);
       }
-      this.emit( "popupClosed", this )
+      this.emit("popupClosed", this);
     }
 
-    return this
+    return this;
   }
 
   fadeIn() {
-    const el = this.element
+    const el = this.element;
 
-    if (!this.hasTransition || !el) return
+    if (!this.hasTransition || !el) return;
 
     // This should always be called AFTER fadeOut (which is governed by the 'transitionend' event).
     // 'transitionend' isn't all that reliable, so, if we try and fadeIn before 'transitionend' has
     // has a chance to run, then we run it ourselves
     if (this.afterTransition) {
-      this.afterFadeOut(el)
+      this.afterFadeOut(el);
     }
 
-    if (el.classList.contains('cc-invisible')) {
-      el.style.display = ''
+    if (el.classList.contains("cc-invisible")) {
+      el.style.display = "";
 
       if (this.options.static) {
-        this.element.parentNode.style.maxHeight = this.element.clientHeight + 'px'
+        this.element.parentNode.style.maxHeight =
+          this.element.clientHeight + "px";
       }
 
-      const fadeInTimeout = 20 // (ms) DO NOT MAKE THIS VALUE SMALLER. See below
+      const fadeInTimeout = 20; // (ms) DO NOT MAKE THIS VALUE SMALLER. See below
 
       // Although most browsers can handle values less than 20ms, it should remain above this value.
       // This is because we are waiting for a "browser redraw" before we remove the 'cc-invisible' class.
@@ -191,7 +194,7 @@ export default class Popup extends Base {
       this.openingTimeout = setTimeout(
         () => this.afterFadeIn(el),
         fadeInTimeout
-      )
+      );
     }
   }
 
@@ -199,57 +202,59 @@ export default class Popup extends Base {
    * This needs to be called after 'fadeIn'. This is the code that actually causes the fadeIn to work
    * There is a good reason why it's called in a timeout. Read 'fadeIn'
    */
-  afterFadeIn( element ) {
-    this.openingTimeout = null
-    element.classList.remove('cc-invisible')
+  afterFadeIn(element) {
+    this.openingTimeout = null;
+    element.classList.remove("cc-invisible");
   }
-  
+
   fadeOut() {
-    if (!this.hasTransition || !this.element) return
+    if (!this.hasTransition || !this.element) return;
 
     if (this.openingTimeout) {
-      clearTimeout(this.openingTimeout)
-      this.afterFadeIn(this.element)
+      clearTimeout(this.openingTimeout);
+      this.afterFadeIn(this.element);
     }
 
-    if (!this.element.classList.contains('cc-invisible')) {
+    if (!this.element.classList.contains("cc-invisible")) {
       if (this.options.static) {
-        this.element.parentNode.style.maxHeight = ''
+        this.element.parentNode.style.maxHeight = "";
       }
 
-      this.afterTransition = () => this.afterFadeOut(this.element)
-      this.element.addEventListener(this.transitionEnd, this.afterTransition)
+      this.afterTransition = () => this.afterFadeOut(this.element);
+      this.element.addEventListener(this.transitionEnd, this.afterTransition);
 
-      this.element.classList.add('cc-invisible')
+      this.element.classList.add("cc-invisible");
     }
   }
-  
+
   afterFadeOut(el) {
-    el.style.display = 'none' // after close and before open, the display should be none
-    el.removeEventListener(this.transitionEnd, this.afterTransition)
-    this.afterTransition = null
+    el.style.display = "none"; // after close and before open, the display should be none
+    el.removeEventListener(this.transitionEnd, this.afterTransition);
+    this.afterTransition = null;
   }
 
   isOpen() {
     return (
       this.element &&
-      this.element.style.display === '' &&
-      (this.hasTransition ? !this.element.classList.contains('cc-invisible') : true)
-    )
+      this.element.style.display === "" &&
+      (this.hasTransition
+        ? !this.element.classList.contains("cc-invisible")
+        : true)
+    );
   }
 
   toggleRevokeButton(show) {
-    if (this.revokeBtn) this.revokeBtn.style.display = show ? '' : 'none'
+    if (this.revokeBtn) this.revokeBtn.style.display = show ? "" : "none";
   }
 
   revokeChoice(preventOpen) {
-    this.options.enabled = true
-    this.clearStatuses()
+    this.options.enabled = true;
+    this.clearStatuses();
 
-    this.emit( "revokeChoice" )
+    this.emit("revokeChoice");
 
     if (!preventOpen) {
-      this.autoOpen()
+      this.autoOpen();
     }
   }
 
@@ -258,7 +263,7 @@ export default class Popup extends Base {
    * @return { boolean } - true if any cookies have been set
    */
   hasAnswered() {
-    return this.getStatuses().some( status => !!status )
+    return this.getStatuses().some((status) => !!status);
   }
 
   /**
@@ -266,20 +271,22 @@ export default class Popup extends Base {
    * @return { array<boolean> } - true if consent has been given
    */
   hasConsented() {
-    return this.getStatuses().map( status => status === statusAllow || status === statusDismiss )
+    return this.getStatuses().map(
+      (status) => status === statusAllow || status === statusDismiss
+    );
   }
 
   // opens the popup if no answer has been given
   autoOpen() {
-    const hasAnswered = this.hasAnswered()
+    const hasAnswered = this.hasAnswered();
     if (!hasAnswered && this.options.enabled) {
-      this.open()
+      this.open();
     } else if (hasAnswered && this.options.revokable) {
-      this.toggleRevokeButton(true)
+      this.toggleRevokeButton(true);
     }
   }
 
-  /** 
+  /**
    * Set's cookie statuses
    * @param { string<status> } allOrUndef      - If this is the only param, set ALL if not, set Uncategorized cookies statuses set to value.
    * @param { string<status> } essential       - Essential Cookies status set to value
@@ -287,40 +294,45 @@ export default class Popup extends Base {
    * @param { string<status> } analytics       - Analytis Cookies status set to value
    * @param { string<status> } marketing       - Marketing Cookies status set to value
    * @return { undefined }
-  */
+   */
   setStatuses() {
-    const { name, expiryDays, domain, path, secure } = this.options.cookie
+    const { name, expiryDays, domain, path, secure } = this.options.cookie;
 
-    const updateCategoryStatus = ( categoryName, status ) => {
+    const updateCategoryStatus = (categoryName, status) => {
       if (isValidStatus(status)) {
-        const cookieName = name+'_'+categoryName
-        const chosenBefore = statuses.indexOf( getCookie(cookieName) ) >= 0
-        setCookie(cookieName, status, expiryDays, domain, path, secure)
-        this.emit( "statusChanged", cookieName, status, chosenBefore, this )
+        const cookieName = name + "_" + categoryName;
+        const chosenBefore = statuses.indexOf(getCookie(cookieName)) >= 0;
+        setCookie(cookieName, status, expiryDays, domain, path, secure);
+        this.emit("statusChanged", cookieName, status, chosenBefore, this);
       } else {
         //this.clearStatuses()
       }
-    }
-    if ( arguments.length === 0 ) {
-      categories.forEach( category => updateCategoryStatus( category, this.userCategories[ category ] ) )
-    } else if (arguments.length === 1){
+    };
+    if (arguments.length === 0) {
+      categories.forEach((category) =>
+        updateCategoryStatus(category, this.userCategories[category])
+      );
+    } else if (arguments.length === 1) {
       if (arguments[0] === statusAllow) {
         this.userCategories = this.tmpUserCategories;
-        categories.forEach( category => updateCategoryStatus( category, this.userCategories[ category ] ) );
-        this.emit( "statusUpdated", this );
-      }
-      else if (arguments[0] === 'allowall') {
+        categories.forEach((category) =>
+          updateCategoryStatus(category, this.userCategories[category])
+        );
+        this.emit("statusUpdated", this);
+      } else if (arguments[0] === "allowall") {
         Object.keys(categories).forEach((idx) => {
-          this.userCategories[categories[idx]] = 'ALLOW';
-          this.tmpUserCategories[categories[idx]] = 'ALLOW';
+          this.userCategories[categories[idx]] = "ALLOW";
+          this.tmpUserCategories[categories[idx]] = "ALLOW";
         });
-        categories.forEach( category => updateCategoryStatus( category, this.userCategories[ category ] ) );
-        this.emit( "statusUpdated", this );
+        categories.forEach((category) =>
+          updateCategoryStatus(category, this.userCategories[category])
+        );
+        this.emit("statusUpdated", this);
       }
-    } else if ( arguments.length > 1 ) {
-      arguments.forEach( ( categoryStatus, index ) => {
-        updateCategoryStatus( this.userCategories[ index ], categoryStatus )
-      })
+    } else if (arguments.length > 1) {
+      arguments.forEach((categoryStatus, index) => {
+        updateCategoryStatus(this.userCategories[index], categoryStatus);
+      });
     }
   }
 
@@ -329,13 +341,17 @@ export default class Popup extends Base {
    * @return { array<string> } - cookie categories status in order of categories
    */
   getStatuses() {
-    return categories.map( categoryName => getCookie(this.options.cookie.name+'_'+categoryName) )
+    return categories.map((categoryName) =>
+      getCookie(this.options.cookie.name + "_" + categoryName)
+    );
   }
 
   exportCurrentStatuses() {
     let output = {};
-    categories.forEach(categoryName => {
-      output[categoryName] = getCookie(this.options.cookie.name+'_'+categoryName);
+    categories.forEach((categoryName) => {
+      output[categoryName] = getCookie(
+        this.options.cookie.name + "_" + categoryName
+      );
     });
 
     return output;
@@ -345,176 +361,209 @@ export default class Popup extends Base {
    * Clear all cookie categoies statuses
    */
   clearStatuses() {
-    const { name, domain, path } = this.options.cookie
-    categories.forEach( categoryName => {
-      setCookie(name+'_'+categoryName, '', -1, domain, path)
-    })
+    const { name, domain, path } = this.options.cookie;
+    categories.forEach((categoryName) => {
+      setCookie(name + "_" + categoryName, "", -1, domain, path);
+    });
   }
-  
+
   canUseCookies() {
-    if (!window.navigator.cookieEnabled || window.CookiesOK || window.navigator.CookiesOK ) {
-      return true
+    if (
+      !window.navigator.cookieEnabled ||
+      window.CookiesOK ||
+      window.navigator.CookiesOK
+    ) {
+      return true;
     }
 
-    const statusesValues = this.getStatuses()
-    const matches = statusesValues.map( ( status, index ) => ( { [categories[index]]: isValidStatus( status ) } ) )
-    const hasMatches = matches.filter( match => match[Object.keys(match)[0]] ).length > 0
-    statusesValues.forEach( ( status, index ) =>
-      this.userCategories[ categories[ index ] ] === status
-        ? status : this.userCategories[ categories[ index ] ] )
+    const statusesValues = this.getStatuses();
+    const matches = statusesValues.map((status, index) => ({
+      [categories[index]]: isValidStatus(status),
+    }));
+    const hasMatches =
+      matches.filter((match) => match[Object.keys(match)[0]]).length > 0;
+    statusesValues.forEach((status, index) =>
+      this.userCategories[categories[index]] === status
+        ? status
+        : this.userCategories[categories[index]]
+    );
 
-    return hasMatches
+    return hasMatches;
   }
 
   // top, bottom, left, right
   getPositionClasses() {
-    return this.options.position.split( '-' ).map( pos => 'cc-'+pos)
+    return this.options.position.split("-").map((pos) => "cc-" + pos);
   }
 
   getPopupClasses() {
-    const opts = this.options
+    const opts = this.options;
     let positionStyle =
-      opts.position == 'top' || opts.position == 'bottom' || opts.position == 'top-push' || opts.position == 'bottomcenter' || opts.position == 'topcenter'
-        ? 'banner'
-        : 'floating'
+      opts.position == "top" ||
+      opts.position == "bottom" ||
+      opts.position == "top-push" ||
+      opts.position == "bottomcenter" ||
+      opts.position == "topcenter"
+        ? "banner"
+        : "floating";
 
     if (isMobile() && opts.mobileForceFloat) {
-      positionStyle = 'floating'
+      positionStyle = "floating";
     }
 
     const classes = [
-      'cc-' + positionStyle, // floating or banner
-      'cc-type-' + opts.type, // add the compliance type
-      'cc-theme-' + opts.theme, // add the theme
-    ]
+      "cc-" + positionStyle, // floating or banner
+      "cc-type-" + opts.type, // add the compliance type
+      "cc-theme-" + opts.theme, // add the theme
+    ];
 
     if (opts.static) {
-      classes.push('cc-static')
+      classes.push("cc-static");
     }
 
-    classes.push.apply(classes, this.getPositionClasses())
+    classes.push.apply(classes, this.getPositionClasses());
 
     // we only add extra styles if `palette` has been set to a valid value
-    this.attachCustomPalette(this.options.palette)
+    this.attachCustomPalette(this.options.palette);
 
     // if we override the palette, add the class that enables this
     if (this.customStyleSelector) {
-      classes.push(this.customStyleSelector)
+      classes.push(this.customStyleSelector);
     }
 
-    return classes
+    return classes;
   }
 
   getSelectLangMarkup() {
     let count = 0;
-    let interpolated = '<div id="lang" style="display: flex;flex-direction: row;align-items: start">';
-    Object.keys(this.options.lang).forEach( prop => {
-      if (this.options.selectedLang!==prop)
+    let interpolated =
+      '<div id="lang" style="display: flex;flex-direction: row;align-items: start">';
+    Object.keys(this.options.lang).forEach((prop) => {
+      if (this.options.selectedLang !== prop)
         interpolated += `<a class="cc-link" href="#" data-lang="${prop}">${prop.toUpperCase()}</a>`;
       count++;
-    })
-    interpolated += '</div>';
+    });
+    interpolated += "</div>";
 
     let final = `<div style='margin-right:5px;margin-left:5px;display: flex;flex-direction: row;align-items: start;justify-content:end'>
-                ${interpolated}</div>`
+                ${interpolated}</div>`;
 
-    if (count > 1)
-      return final;
-    else
-      return '';
+    if (count > 1) return final;
+    else return "";
   }
 
   getPopupInnerMarkup() {
-    const interpolated = {}
-    const opts = this.options
+    const interpolated = {};
+    const opts = this.options;
 
     // removes link if showLink is false
     if (!opts.showLink) {
-      opts.elements.link = '' 
-      opts.elements.messagelink = opts.elements.message
+      opts.elements.link = "";
+      opts.elements.messagelink = opts.elements.message;
     }
 
-    Object.keys(opts.elements).forEach( prop => {
-      interpolated[prop] = interpolateString(
-        opts.elements[prop],
-        name => {
-          const str = opts.content[name]
-          return name && typeof str == 'string' && str.length ? str : ''
-        }
-      )
-    })
+    Object.keys(opts.elements).forEach((prop) => {
+      interpolated[prop] = interpolateString(opts.elements[prop], (name) => {
+        const str = opts.content[name];
+        return name && typeof str == "string" && str.length ? str : "";
+      });
+    });
 
     // checks if the type is valid and defaults to info if it's not
-    let complianceType = opts.compliance[opts.type]
+    let complianceType = opts.compliance[opts.type];
     if (!complianceType) {
-      complianceType = opts.compliance.info
+      complianceType = opts.compliance.info;
     }
 
     // build the compliance types from the already interpolated `elements`
-    interpolated.compliance = interpolateString( complianceType, name => interpolated[name] )
+    interpolated.compliance = interpolateString(
+      complianceType,
+      (name) => interpolated[name]
+    );
 
     // checks if the layout is valid and defaults to basic if it's not
-    let layout = opts.layouts[opts.layout]
+    let layout = opts.layouts[opts.layout];
     if (!layout) {
-      layout = opts.layouts.basic
+      layout = opts.layouts.basic;
     }
-    
-    return interpolateString(layout, match =>interpolated[match] )
+
+    return interpolateString(layout, (match) => interpolated[match]);
   }
 
   appendMarkup(markup) {
-    const opts = this.options
-    const div = document.createElement('div')
+    const opts = this.options;
+    const div = document.createElement("div");
     const cont =
       opts.container && opts.container.nodeType === 1
         ? opts.container
-        : document.body
+        : document.body;
 
-    div.innerHTML = markup
+    div.innerHTML = markup;
 
-    const el = div.children[0]
+    const el = div.children[0];
 
-    el.style.display = 'none'
+    el.style.display = "none";
 
-    if ((el.classList.contains('cc-window') || el.classList.contains('cc-modal')) && this.hasTransition) {
-      el.classList.add('cc-invisible')
+    if (
+      (el.classList.contains("cc-window") ||
+        el.classList.contains("cc-modal")) &&
+      this.hasTransition
+    ) {
+      el.classList.add("cc-invisible");
 
-      if(this.userCategoryShow != undefined){
-        el.querySelectorAll('#categories li').forEach (element => {
-          if(!(this.userCategoryShow.indexOf(element.getAttribute('name')) > -1)){
-            element.style.display = 'none';
+      if (this.userCategoryShow != undefined) {
+        el.querySelectorAll("#categories li").forEach((element) => {
+          if (
+            !(this.userCategoryShow.indexOf(element.getAttribute("name")) > -1)
+          ) {
+            element.style.display = "none";
           }
         });
       }
     }
 
-    el.querySelectorAll('#lang a').forEach(dropdown => {
-      dropdown.addEventListener('click', (event) => {
+    // เพิ่ม event listener สำหรับปุ่ม cross-mark
+    const crossMark = el.querySelector(".cross-mark");
+    if (crossMark) {
+      crossMark.addEventListener("click", () => {
+        this.close();
+      });
+    }
+
+    el.querySelectorAll("#lang a").forEach((dropdown) => {
+      dropdown.addEventListener("click", (event) => {
         this.options.selectedLang = event.target.dataset.lang;
-        let pcube_cc = getCookie('pcube_cc');
+        let pcube_cc = getCookie("pcube_cc");
         if (pcube_cc) {
           pcube_cc = JSON.parse(pcube_cc);
-          setCookie('pcube_cc', JSON.stringify({
-            id: pcube_cc.id, 
-            selectedLang: this.options.selectedLang
-          }), 365);
+          setCookie(
+            "pcube_cc",
+            JSON.stringify({
+              id: pcube_cc.id,
+              selectedLang: this.options.selectedLang,
+            }),
+            365
+          );
         }
 
         if (this.options.lang[this.options.selectedLang]) {
           this.options.content = this.options.lang[this.options.selectedLang];
         }
         this.destroy();
-        
-        let template = this.options.position==='full'?this.options.modal:this.options.window;
+
+        let template =
+          this.options.position === "full"
+            ? this.options.modal
+            : this.options.window;
         let cookiePopup = template
-          .replace('{{classes}}', this.getPopupClasses().join(' '))
-          .replace('{{children}}', this.getPopupInnerMarkup())
-          .replace('{{langOption}}', this.getSelectLangMarkup());
-          
+          .replace("{{classes}}", this.getPopupClasses().join(" "))
+          .replace("{{children}}", this.getPopupInnerMarkup())
+          .replace("{{langOption}}", this.getSelectLangMarkup());
+
         // if user passes html, use it instead
-        const customHTML = this.options.overrideHTML
-        if (typeof customHTML == 'string' && customHTML.length) {
-          cookiePopup = customHTML
+        const customHTML = this.options.overrideHTML;
+        if (typeof customHTML == "string" && customHTML.length) {
+          cookiePopup = customHTML;
         }
 
         // if static, we need to grow the element from 0 height so it doesn't jump the page
@@ -522,291 +571,324 @@ export default class Popup extends Base {
 
         if (this.options.static) {
           // `grower` is a wrapper div with a hidden overflow whose height is animated
-          const wrapper = this.appendMarkup(`<div class="cc-grower">${cookiePopup}</div>`)
+          const wrapper = this.appendMarkup(
+            `<div class="cc-grower">${cookiePopup}</div>`
+          );
 
-          wrapper.style.display = '' // set it to visible (because appendMarkup hides it)
-          this.element = wrapper.firstChild // get the `element` reference from the wrapper
-          this.element.style.display = 'none'
-          this.element.classList.add('cc-invisible')
+          wrapper.style.display = ""; // set it to visible (because appendMarkup hides it)
+          this.element = wrapper.firstChild; // get the `element` reference from the wrapper
+          this.element.style.display = "none";
+          this.element.classList.add("cc-invisible");
         } else {
-          this.element = this.appendMarkup(cookiePopup)
+          this.element = this.appendMarkup(cookiePopup);
         }
 
-        this.applyAutoDismiss()
-        this.applyRevokeButton()
+        this.applyAutoDismiss();
+        this.applyRevokeButton();
 
         this.open();
       });
-    })
+    });
 
-    el.addEventListener('click', event => this.handleButtonClick( event ) )
-    el.querySelectorAll( '.cc-btn [type="checkbox"]' ).forEach( checkbox => {
-      checkbox.addEventListener( 'change', () => {
+    el.addEventListener("click", (event) => this.handleButtonClick(event));
+    el.querySelectorAll('.cc-btn [type="checkbox"]').forEach((checkbox) => {
+      checkbox.addEventListener("change", () => {
         //this.userCategories[ checkbox.name ] = checkbox.checked ? 'ALLOW' : 'DENY';
-        this.tmpUserCategories[ checkbox.name ] = checkbox.checked ? 'ALLOW' : 'DENY'
+        this.tmpUserCategories[checkbox.name] = checkbox.checked
+          ? "ALLOW"
+          : "DENY";
       });
-      
-      if (checkbox.name === 'ESSENTIAL') {
+
+      if (checkbox.name === "ESSENTIAL") {
         checkbox.disabled = true;
         checkbox.checked = true;
-      }
-      else {
-        checkbox.addEventListener( 'click', event => (event.stopPropagation()) )
-        checkbox.checked = this.userCategories[ checkbox.name ] === 'ALLOW';
+      } else {
+        checkbox.addEventListener("click", (event) => event.stopPropagation());
+        checkbox.checked = this.userCategories[checkbox.name] === "ALLOW";
       }
     });
-    el.querySelectorAll( '.cc-btn-checkbox' ).forEach( checkbox => {
-
-      if (checkbox.dataset.cat === 'ESSENTIAL') {
-      }
-      else {
-        checkbox.addEventListener( 'click', event => {
-          el.querySelectorAll( '.cc-btn [type="checkbox"]' ).forEach( chk => {
+    el.querySelectorAll(".cc-btn-checkbox").forEach((checkbox) => {
+      if (checkbox.dataset.cat === "ESSENTIAL") {
+      } else {
+        checkbox.addEventListener("click", (event) => {
+          el.querySelectorAll('.cc-btn [type="checkbox"]').forEach((chk) => {
             if (chk.name === checkbox.dataset.cat) {
               chk.checked = !chk.checked;
-              this.tmpUserCategories[ chk.name ] = chk.checked ? 'ALLOW' : 'DENY';
+              this.tmpUserCategories[chk.name] = chk.checked ? "ALLOW" : "DENY";
             }
           });
-        })
-
+        });
       }
-    })
+    });
 
-    el.querySelectorAll(".cc-info").forEach( showInfo => {
-      showInfo.addEventListener('mousedown', function ( event ) {
-        if ( this === document.activeElement  ) {
-          this.blur()
-          event.preventDefault()
+    el.querySelectorAll(".cc-info").forEach((showInfo) => {
+      showInfo.addEventListener("mousedown", function (event) {
+        if (this === document.activeElement) {
+          this.blur();
+          event.preventDefault();
         }
-      })
-    })
+      });
+    });
 
     if (opts.autoAttach) {
       try {
         if (!cont.firstChild) {
-          cont.appendChild(el)
+          cont.appendChild(el);
         } else {
           cont.insertBefore(el, cont.firstChild);
         }
-      } catch ( error ) {
-        throw new Error( "No container to attach too. Make sure the DOM has loaded. Is your script loaded just before the `</body>` tag?" )
+      } catch (error) {
+        throw new Error(
+          "No container to attach too. Make sure the DOM has loaded. Is your script loaded just before the `</body>` tag?"
+        );
       }
     }
 
-    return el
+    return el;
   }
 
   handleButtonClick(event) {
     // returns the parent element with the specified class, or the original element - null if not found
-    const btn = traverseDOMPath(event.target, 'cc-btn') || event.target
+    const btn = traverseDOMPath(event.target, "cc-btn") || event.target;
 
-    if (btn.classList.contains( 'cc-btn' ) && btn.classList.contains( 'cc-customize' )){
-      this.emit( "cc-customize", this.myId );
+    if (
+      btn.classList.contains("cc-btn") &&
+      btn.classList.contains("cc-customize")
+    ) {
+      this.emit("cc-customize", this.myId);
       this.close(true);
       return;
     }
 
-    if (btn.classList.contains( 'cc-btn' ) && btn.classList.contains( 'cc-allowall' )){
-      this.setStatuses('allowall')
+    if (
+      btn.classList.contains("cc-btn") &&
+      btn.classList.contains("cc-allowall")
+    ) {
+      this.setStatuses("allowall");
       this.close(true);
       return;
     }
-    
-    if (btn.classList.contains( 'cc-btn' ) && btn.classList.contains( 'cc-save' )){
-      this.setStatuses()
-      this.close(true)
-      return
+
+    if (btn.classList.contains("cc-btn") && btn.classList.contains("cc-save")) {
+      this.setStatuses();
+      this.close(true);
+      return;
     }
-    if (btn.classList.contains( 'cc-btn' )) {
+    if (btn.classList.contains("cc-btn")) {
       const matches = btn.className.match(
-        new RegExp('\\bcc-(' + statuses.map( str => str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&') ).join('|') + ')\\b')
-      )
-      const match = (matches && matches[1]) || false
+        new RegExp(
+          "\\bcc-(" +
+            statuses
+              .map((str) =>
+                str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&")
+              )
+              .join("|") +
+            ")\\b"
+        )
+      );
+      const match = (matches && matches[1]) || false;
       if (match) {
-        this.setStatuses(match)
-        this.close(true)
+        this.setStatuses(match);
+        this.close(true);
       }
-      return
+      return;
     }
-    if (btn.classList.contains( 'cc-close' )) {
-      this.setStatuses(statusDismiss)
-      this.close(true)
-      return
+    if (btn.classList.contains("cc-close")) {
+      this.setStatuses(statusDismiss);
+      this.close(true);
+      return;
     }
-    if (btn.classList.contains( 'cc-revoke' )) {
-      this.revokeChoice()
-      return
+    if (btn.classList.contains("cc-revoke")) {
+      this.revokeChoice();
+      return;
     }
   }
 
   attachCustomPalette(palette) {
-    const hashStr = hash(JSON.stringify(palette))
-    const selector = 'cc-color-override-' + hashStr
-    const isValid = isPlainObject(palette)
+    const hashStr = hash(JSON.stringify(palette));
+    const selector = "cc-color-override-" + hashStr;
+    const isValid = isPlainObject(palette);
 
-    this.customStyleSelector = isValid ? selector : null
+    this.customStyleSelector = isValid ? selector : null;
 
     if (isValid) {
-      addCustomStylesheet(hashStr, palette, '.' + selector)
+      addCustomStylesheet(hashStr, palette, "." + selector);
     }
-    return isValid
+    return isValid;
   }
 
-
-  getEventPath( event ) {
-    const path = event.composedPath ? event.composedPath() : (function ( arr, element ) {
-      while ( element ) {
-        arr.push( element )
-        element = element.parentNode
-      }
-      return arr
-    })([],event.target )
-    if ( !path ) {
-      console.warn( "'.path' & '.composedPath' failed to generate an event path." )
-      return
+  getEventPath(event) {
+    const path = event.composedPath
+      ? event.composedPath()
+      : (function (arr, element) {
+          while (element) {
+            arr.push(element);
+            element = element.parentNode;
+          }
+          return arr;
+        })([], event.target);
+    if (!path) {
+      console.warn(
+        "'.path' & '.composedPath' failed to generate an event path."
+      );
+      return;
     }
-    return path
+    return path;
   }
 
   applyAutoDismiss() {
     const {
       enabled,
-      dismissOnTimeout  : delay,
-      dismissOnScroll   :scrollRange,
+      dismissOnTimeout: delay,
+      dismissOnScroll: scrollRange,
       dismissOnLinkClick,
       dismissOnWindowClick,
-      dismissOnKeyPress
-    } = this.options
+      dismissOnKeyPress,
+    } = this.options;
 
-    if ( enabled ) {
-      if (typeof delay == 'number' && delay >= 0) {
-        this.dismissTimeout = setTimeout( ()=> {
-          this.setStatuses(statusDismiss)
-          this.close(true)
-        }, Math.floor(delay))
-      } else if (typeof scrollRange == 'number' && scrollRange >= 0) {
+    if (enabled) {
+      if (typeof delay == "number" && delay >= 0) {
+        this.dismissTimeout = setTimeout(() => {
+          this.setStatuses(statusDismiss);
+          this.close(true);
+        }, Math.floor(delay));
+      } else if (typeof scrollRange == "number" && scrollRange >= 0) {
         this.onWindowScroll = () => {
           if (window.pageYOffset > Math.floor(scrollRange)) {
-            this.setStatuses(statusDismiss)
-            this.close(true)
+            this.setStatuses(statusDismiss);
+            this.close(true);
 
-            window.removeEventListener('scroll', this.onWindowScroll, { passive: true })
-            this.onWindowScroll = null
+            window.removeEventListener("scroll", this.onWindowScroll, {
+              passive: true,
+            });
+            this.onWindowScroll = null;
           }
-        }
-        window.addEventListener('scroll', this.onWindowScroll, { passive: true })
+        };
+        window.addEventListener("scroll", this.onWindowScroll, {
+          passive: true,
+        });
       } else if (dismissOnWindowClick) {
-        this.onWindowClick = evt => {
-          if ( !getEventPath( evt ).some( element =>
-                  this.options.ignoreClicksFrom.some( ignoredClick =>
-                    element.classList && element.classList.contains( ignoredClick )
-                  )
-                )
+        this.onWindowClick = (evt) => {
+          if (
+            !getEventPath(evt).some((element) =>
+              this.options.ignoreClicksFrom.some(
+                (ignoredClick) =>
+                  element.classList && element.classList.contains(ignoredClick)
+              )
+            )
           ) {
-            this.setStatuses(statusDismiss)
-            this.close(true)
-            
-            window.removeEventListener('click', this.onWindowClick)
-            window.removeEventListener('touchend', this.onWindowClick)
-            this.onWindowClick = null
-          }
-        }
+            this.setStatuses(statusDismiss);
+            this.close(true);
 
-        window.addEventListener('click', this.onWindowClick)
-        window.addEventListener('touchend', this.onWindowClick)
+            window.removeEventListener("click", this.onWindowClick);
+            window.removeEventListener("touchend", this.onWindowClick);
+            this.onWindowClick = null;
+          }
+        };
+
+        window.addEventListener("click", this.onWindowClick);
+        window.addEventListener("touchend", this.onWindowClick);
       } else if (dismissOnLinkClick) {
-        this.onLinkClick = evt => {
-          if ( getEventPath( evt ).some( elem => typeof elem.tagName !== 'undefined' && elem.tagName === 'A' ) ) {
-            this.setStatuses( statusDismiss )
-            this.close( true )
-            window.removeEventListener('click', this.onLinkClick)
-            this.onLinkClick = null
+        this.onLinkClick = (evt) => {
+          if (
+            getEventPath(evt).some(
+              (elem) =>
+                typeof elem.tagName !== "undefined" && elem.tagName === "A"
+            )
+          ) {
+            this.setStatuses(statusDismiss);
+            this.close(true);
+            window.removeEventListener("click", this.onLinkClick);
+            this.onLinkClick = null;
           }
-        }
-        window.addEventListener('click', this.onLinkClick)
-      } else if ( dismissOnKeyPress ) {
-          this.onKeyPress = event => {
-            const { keyCode } = event
-            if ( keyCode === 13 ) {
-              this.setStatuses( statusAllow )
-              this.close( true )
-            } else if ( keyCode === 27) {
-              this.setStatuses( statusDismiss )
-              this.close( true )
-            }
+        };
+        window.addEventListener("click", this.onLinkClick);
+      } else if (dismissOnKeyPress) {
+        this.onKeyPress = (event) => {
+          const { keyCode } = event;
+          if (keyCode === 13) {
+            this.setStatuses(statusAllow);
+            this.close(true);
+          } else if (keyCode === 27) {
+            this.setStatuses(statusDismiss);
+            this.close(true);
           }
-          window.addEventListener( 'onkeypress', this.onKeyPress )
+        };
+        window.addEventListener("onkeypress", this.onKeyPress);
       }
     }
   }
 
   applyRevokeButton() {
     // revokable is true if advanced compliance is selected
-    if (this.options.type != 'info' && this.options.regionalLaw == true) this.options.revokable = true
+    if (this.options.type != "info" && this.options.regionalLaw == true)
+      this.options.revokable = true;
     // animateRevokable false for mobile devices
-    if (isMobile()) this.options.animateRevokable = false
+    if (isMobile()) this.options.animateRevokable = false;
 
     if (this.options.revokable) {
-      const classes = this.getPositionClasses()
+      const classes = this.getPositionClasses();
       if (this.options.animateRevokable) {
-        classes.push('cc-animate')
+        classes.push("cc-animate");
       }
       if (this.customStyleSelector) {
-        classes.push(this.customStyleSelector)
+        classes.push(this.customStyleSelector);
       }
       if (this.options.theme) {
-        classes.push('cc-theme-'+this.options.theme)
+        classes.push("cc-theme-" + this.options.theme);
       }
       const revokeBtn = this.options.revokeBtn
-        .replace('{{classes}}', classes.join(' '))
-        .replace('{{policy}}', this.options.content.policy)
+        .replace("{{classes}}", classes.join(" "))
+        .replace("{{policy}}", this.options.content.policy);
 
-      this.revokeBtn = this.appendMarkup(revokeBtn)
+      this.revokeBtn = this.appendMarkup(revokeBtn);
 
-      const btn = this.revokeBtn
+      const btn = this.revokeBtn;
       if (this.options.animateRevokable) {
-        const onMouseMove = throttle(function(evt) {
-          let active = false
-          const minY = 20
-          const maxY = window.innerHeight - 20
+        const onMouseMove = throttle(function (evt) {
+          let active = false;
+          const minY = 20;
+          const maxY = window.innerHeight - 20;
 
-          if ( ( btn.classList.contains( 'cc-top' ) && evt.clientY < minY ) ||
-                ( btn.classList.contains( 'cc-bottom' ) && evt.clientY > maxY ) ) {
-            active = true
+          if (
+            (btn.classList.contains("cc-top") && evt.clientY < minY) ||
+            (btn.classList.contains("cc-bottom") && evt.clientY > maxY)
+          ) {
+            active = true;
           }
 
-          if (active && !btn.classList.contains( 'cc-active' ) ) {
-              btn.classList.add( 'cc-active' )
-          } else if ( !active && btn.classList.contains( 'cc-active' ) ) {
-              btn.classList.remove( 'cc-active' )
+          if (active && !btn.classList.contains("cc-active")) {
+            btn.classList.add("cc-active");
+          } else if (!active && btn.classList.contains("cc-active")) {
+            btn.classList.remove("cc-active");
           }
-        }, 200)
+        }, 200);
 
-        this.onMouseMove = onMouseMove
-        window.addEventListener('mousemove', onMouseMove)
+        this.onMouseMove = onMouseMove;
+        window.addEventListener("mousemove", onMouseMove);
       }
     }
   }
-  destroy(){
-    console.warn( "Destroying...")
-    if ( this.element ){
-      this.element.remove()
+  destroy() {
+    console.warn("Destroying...");
+    if (this.element) {
+      this.element.remove();
     }
-    if ( this.revokeBtn ){
-      this.revokeBtn.remove()
+    if (this.revokeBtn) {
+      this.revokeBtn.remove();
     }
-    if ( this.onWindowScroll ){
-      window.removeEventListener('scroll', this.onWindowScroll )
+    if (this.onWindowScroll) {
+      window.removeEventListener("scroll", this.onWindowScroll);
     }
-    if ( this.onWindowClick ) {
-      window.removeEventListener('click', this.onWindowClick )
-      window.removeEventListener('touchend', this.onWindowClick)
+    if (this.onWindowClick) {
+      window.removeEventListener("click", this.onWindowClick);
+      window.removeEventListener("touchend", this.onWindowClick);
     }
-    if ( this.onLinkClick ) {
-      window.removeEventListener('click', this.onLinkClick)
+    if (this.onLinkClick) {
+      window.removeEventListener("click", this.onLinkClick);
     }
-    if ( this.onKeyPress ) {
-      window.addEventListener( 'onkeypress', this.onKeyPress )
+    if (this.onKeyPress) {
+      window.addEventListener("onkeypress", this.onKeyPress);
     }
   }
 }
