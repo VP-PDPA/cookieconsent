@@ -162,19 +162,48 @@
 }
 
 .cc-close {
-  display: block;
-  position: absolute;
-  top: 0.5em;
-  right: 0.5em;
-  font-size: 1.6em;
+  display: flex;
+  justify-content: flex-end;
+  font-size: 1em;
   opacity: 0.9;
 
   /* seeing as this contains text and not an image, the element taller than it is wide (because it is text) */
   /*  - we want it to be a square, because it's acting as an icon */
   /*  - setting the line height normalizes the height */
   line-height: 0.75;
+
+  mix-blend-mode: luminosity;
 }
-.cc-close:hover,
+.cc-close:hover {
+  color: lightgray; /* เปลี่ยนสีของตัวอักษรเมื่อเอาเมาส์ชี้เป็นสีเทาอ่อน */
+}
 .cc-close:focus {
   opacity: 1;
+}
+
+.cross-mark {
+  display: inline-block;
+  width: 20px;
+  position: relative;
+  transform: rotate(45deg);
+  opacity: 0.8;
+}
+
+.cross-mark::before,
+.cross-mark::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 2px;
+  background-color: white; /* เปลี่ยนสีที่นี่ */
+}
+
+.cross-mark::before {
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+
+.cross-mark::after {
+  transform: translate(-50%, -50%);
 }
