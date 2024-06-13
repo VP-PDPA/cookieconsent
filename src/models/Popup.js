@@ -340,7 +340,6 @@ export default class Popup extends Base {
 
     return output;
   }
-
   /**
    * Clear all cookie categoies statuses
    */
@@ -350,7 +349,7 @@ export default class Popup extends Base {
       setCookie(name+'_'+categoryName, '', -1, domain, path)
     })
   }
-  
+
   canUseCookies() {
     if (!window.navigator.cookieEnabled || window.CookiesOK || window.navigator.CookiesOK ) {
       return true
@@ -488,6 +487,14 @@ export default class Popup extends Base {
       }
     }
 
+    // เพิ่ม event listener สำหรับปุ่ม cross-mark
+    const crossMark = el.querySelector(".cross-mark");
+    if (crossMark) {
+      crossMark.addEventListener("click", () => {
+        this.close();
+      });
+    }
+
     el.querySelectorAll('#lang a').forEach(dropdown => {
       dropdown.addEventListener('click', (event) => {
         this.options.selectedLang = event.target.dataset.lang;
@@ -504,7 +511,7 @@ export default class Popup extends Base {
           this.options.content = this.options.lang[this.options.selectedLang];
         }
         this.destroy();
-        
+
         let template = this.options.position==='full'?this.options.modal:this.options.window;
         let cookiePopup = template
           .replace('{{classes}}', this.getPopupClasses().join(' '))

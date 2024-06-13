@@ -103,7 +103,12 @@ export default {
     <div class="cc-modal">
       <div class="cc-modal-bg"></div>
       <div role="dialog" aria-live="polite" aria-label="cookieconsent" aria-describedby="cookieconsent:desc" class="cc-window2 {{classes}}">
-        {{langOption}}
+        
+        <span aria-label="dismiss cookie message" role=button tabindex="0" class="cc-close">
+          {{langOption}}
+          <span class="cross-mark">
+          </span>
+        </span>
         {{children}}
         <div class="cc-powered-by">${POWERED_BY_MESSAGE}</div>
       </div>
@@ -122,7 +127,7 @@ export default {
     'opt-out':
       '<div class="cc-compliance cc-highlight">{{customize}}</div><div class="cc-compliance cc-highlight">{{dismiss}}{{deny}}</div>',
     'opt-in-detail':
-      '<div class="form">{{categories}}</div><div class="cc-compliance cc-highlight">{{allowall}}{{allow}}</div>',
+      `<div class="form">{{categories}}</div><div class="cc-compliance cc-highlight">{{allowall}}{{allow}}</div>`,
     'opt-out-detail':
       '<div class="form">{{categories}}</div><div class="cc-compliance cc-highlight">{{dismiss}}{{deny}}</div>'
     //categories: '<div class="form">{{categories}}{{save}}</div>'
