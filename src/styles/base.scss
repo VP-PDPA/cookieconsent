@@ -3,15 +3,18 @@
 .cc-revoke {
   position: fixed;
   overflow: hidden;
-  box-sizing: border-box; /* exclude padding when dealing with width */
+  box-sizing: border-box;
+  /* exclude padding when dealing with width */
 
   font-family: 'Kanit', Helvetica, Calibri, Arial, sans-serif;
-  font-size: 16px; /* by setting the base font here, we can size the rest of the popup using CSS `em` */
+  font-size: 16px;
+  /* by setting the base font here, we can size the rest of the popup using CSS `em` */
   line-height: 1.5em;
 
   display: flex;
   // flex-wrap: nowrap;
-  flex-wrap: wrap; /** For wrapping the full-width powered-by message new row */
+  flex-wrap: wrap;
+  /** For wrapping the full-width powered-by message new row */
 
   /* the following are random unjustified styles - just because - should probably be removed */
   z-index: 9998;
@@ -26,10 +29,12 @@
 .cc-modal {
   position: fixed;
   overflow: hidden;
-  box-sizing: border-box; /* exclude padding when dealing with width */
+  box-sizing: border-box;
+  /* exclude padding when dealing with width */
 
   font-family: 'Kanit', Helvetica, Calibri, Arial, sans-serif;
-  font-size: 16px; /* by setting the base font here, we can size the rest of the popup using CSS `em` */
+  font-size: 16px;
+  /* by setting the base font here, we can size the rest of the popup using CSS `em` */
   line-height: 1.5em;
 
   display: flex;
@@ -48,10 +53,12 @@
 .cc-modal-bg {
   position: fixed;
   overflow: hidden;
-  box-sizing: border-box; /* exclude padding when dealing with width */
+  box-sizing: border-box;
+  /* exclude padding when dealing with width */
 
   font-family: 'Kanit', Helvetica, Calibri, Arial, sans-serif;
-  font-size: 16px; /* by setting the base font here, we can size the rest of the popup using CSS `em` */
+  font-size: 16px;
+  /* by setting the base font here, we can size the rest of the popup using CSS `em` */
   line-height: 1.5em;
 
   display: flex;
@@ -71,10 +78,12 @@
 
 .cc-window2 {
   overflow: hidden;
-  box-sizing: border-box; /* exclude padding when dealing with width */
+  box-sizing: border-box;
+  /* exclude padding when dealing with width */
 
   font-family: 'Kanit', Helvetica, Calibri, Arial, sans-serif;
-  font-size: 16px; /* by setting the base font here, we can size the rest of the popup using CSS `em` */
+  font-size: 16px;
+  /* by setting the base font here, we can size the rest of the popup using CSS `em` */
   line-height: 1.5em;
 
   //display: flex;
@@ -96,9 +105,11 @@
 /* 2 basic types of window - floating / banner */
 .cc-window.cc-floating {
   padding: 2em;
-  max-width: 24em; /* 1em == 16px therefore 24em == 384px */
+  max-width: 24em;
+  /* 1em == 16px therefore 24em == 384px */
   flex-direction: column;
 }
+
 .cc-window.cc-banner {
   padding: 1em 1.8em;
   width: 100%;
@@ -108,6 +119,7 @@
 .cc-revoke {
   padding: 0.5em;
 }
+
 .cc-revoke:hover {
   text-decoration: underline;
 }
@@ -131,9 +143,11 @@
   padding: 0.2em;
   text-decoration: underline;
 }
+
 .cc-link:hover {
   opacity: 1;
 }
+
 .cc-link:active,
 .cc-link:visited {
   color: initial;
@@ -174,9 +188,12 @@
 
   mix-blend-mode: luminosity;
 }
+
 .cc-close:hover {
-  color: lightgray; /* เปลี่ยนสีของตัวอักษรเมื่อเอาเมาส์ชี้เป็นสีเทาอ่อน */
+  color: lightgray;
+  /* เปลี่ยนสีของตัวอักษรเมื่อเอาเมาส์ชี้เป็นสีเทาอ่อน */
 }
+
 .cc-close:focus {
   opacity: 1;
 }
@@ -197,7 +214,7 @@
   left: 50%;
   width: 20px;
   height: 2px;
-  background-color: white; /* เปลี่ยนสีที่นี่ */
+  background-color: currentcolor;
 }
 
 .cross-mark::before {
