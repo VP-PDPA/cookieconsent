@@ -662,7 +662,7 @@ export default class Popup extends Base {
       return
     }
     if (btn.classList.contains( 'cc-close' )) {
-      // this.setStatuses(statusDismiss)
+      this.setStatuses(statusDismiss)
       this.close(true)
       return
     }

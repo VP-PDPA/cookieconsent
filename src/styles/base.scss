@@ -204,6 +204,11 @@
   position: relative;
   transform: rotate(45deg);
   opacity: 0.8;
+  cursor: pointer;
+}
+
+.cross-mark:hover {
+  opacity: 1;
 }
 
 .cross-mark::before,

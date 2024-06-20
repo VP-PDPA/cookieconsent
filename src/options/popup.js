@@ -104,7 +104,7 @@ export default {
       <div class="cc-modal-bg"></div>
       <div role="dialog" aria-live="polite" aria-label="cookieconsent" aria-describedby="cookieconsent:desc" class="cc-window2 {{classes}}">
         
-        <span aria-label="dismiss cookie message" role=button tabindex="0" class="cc-close">
+        <span style="display: flex;justify-content: flex-end;">
           {{langOption}}
           <span class="cross-mark">
           </span>
