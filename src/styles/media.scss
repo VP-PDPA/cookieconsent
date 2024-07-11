@@ -79,9 +79,23 @@
   }
   .form {
     width    : 100%;
-    max-width: 350px;
+    // max-width: 350px;
   }
   .cc-btn:not(.cc-info):not(.cc-save){
     width: calc( 100% - 16px);
+  }
+}
+
+@media screen and (max-width: 520px){
+  .cc-full{
+    width: 90%;
+  }
+  .cc-categories {
+    display: block;
+    /* padding-left: 20px; */
+    padding-bottom: 20px;
+    margin-left: -5%;
+    max-height: 50vh;
+    overflow: auto;
   }
 }

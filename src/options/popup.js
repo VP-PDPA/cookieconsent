@@ -74,8 +74,8 @@ export default {
     categories: '<ul class="cc-categories" id="categories">' +
       categories.map( ( category, index ) =>
         `<li class="cc-category cc-highlight" style="margin-bottom:5px;" name=${category}>
-          <button class="cc-btn" style="height:40px" tabindex="0">
-            <input style="height:21px;width:21px;margin-top:4px;" type="checkbox" name="${category}"/>
+          <button class="cc-btn" style="display: flex" tabindex="0">
+            <input style="height:21px;width:21px;" type="checkbox" name="${category}"/>
             <div class="cc-btn-checkbox" style="font-weight: bold;margin-left:10px;margin-top:2px;" data-cat="${category}">{{${category.toLowerCase()}}}</div>
           </button>
           <div style="margin-left:15px;font-weight: normal;">{{cat${category.toLowerCase()}}}</div>
