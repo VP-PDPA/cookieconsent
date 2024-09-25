@@ -252,9 +252,13 @@ function blockUnblockScript(category, status) {
   }
 };
 
-let cookieId = getCookie('pcube_cc');
-const currentUuid = cookieId===undefined?uuidv4():cookieId.id;
-if (cookieId === undefined)
+// read cookie string
+const cookieStr = getCookie('pcube_cc');
+// parse cookie string to object
+const cookieObj = cookieStr === undefined?undefined:JSON.parse(cookieStr);
+// currentUuid from cookie or generate new one
+const currentUuid = cookieObj===undefined?uuidv4():cookieObj.id;
+if (cookieStr === undefined)
   setCookie('pcube_cc', JSON.stringify({
     id: currentUuid, 
     selectedLang: dataParam.selectedLang
