@@ -259,6 +259,7 @@ const cookieObj = cookieStr === undefined?undefined:JSON.parse(cookieStr);
 // currentUuid from cookie or generate new one
 const currentUuid = cookieObj===undefined?uuidv4():cookieObj.id;
 if (cookieStr === undefined)
+  // if cookie not exist, set new cookie
   setCookie('pcube_cc', JSON.stringify({
     id: currentUuid, 
     selectedLang: dataParam.selectedLang
