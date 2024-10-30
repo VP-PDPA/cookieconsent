@@ -39,11 +39,11 @@ export default {
     policy : 'Cookie Policy',
     customize: 'Customize',
     essential: "Essential",
-    personalization: "Personalization",
+    functional: "Functional",
     analytics: "Analytics",
     marketing: "Marketing",
     catessential: 'These cookies are essential for the website function, such as identifies and maintains user session, login authentication. These technical cookies are deleted after you quit your browser.',
-    catpersonalization: 'These cookies are used for remembering and tracking user information and setting : these may include language preferences, the type of browser used to access services and the website, etc.',
+    catfunctional: 'These cookies are used for remembering and tracking user information and setting : these may include language preferences, the type of browser used to access services and the website, etc.',
     catanalytics: 'These cookies are used for internal research on how we can improve the service for all our users. These cookies help us to count the number of visitors and to see how visitors journey around the website.',
     catmarketing: 'These cookies are used to target advertising to user based on browsing activity, purchasing and the links that user have followed. We may also share this information with third parties for marketing purpose.'
   },
