@@ -106,7 +106,6 @@ export default {
         
         <span style="display: flex;justify-content: flex-end;">
           {{langOption}}
-          <span class="cross-mark">
           </span>
         </span>
         {{children}}
@@ -142,7 +141,7 @@ export default {
     basic         : '{{messagelink}}{{compliance}}',
     'basic-close' : '{{messagelink}}{{compliance}}{{close}}',
     'basic-header': '{{header}}{{message}}{{link}}{{compliance}}',
-    'detail'      : '{{messagelink}}{{compliance}}'
+    'detail'      : '{{close}}{{messagelink}}{{compliance}}'
     // add a custom layout here, then add some new css with the class '.cc-layout-my-cool-layout'
     //'my-cool-layout': '<div class="my-special-layout">{{message}}{{compliance}}</div>{{close}}',
   },
