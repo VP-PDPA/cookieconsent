@@ -110,6 +110,15 @@
   flex-direction: column;
 }
 
+.cc-categories {
+  max-height: 60vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 0.5rem;
+  margin-right: 0;
+  box-sizing: border-box;
+}
+
 .cc-window.cc-banner {
   padding: 1em 1.8em;
   width: 100%;
