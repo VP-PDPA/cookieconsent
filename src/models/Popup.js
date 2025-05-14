@@ -24,6 +24,7 @@ import {
 export default class Popup extends Base {
   constructor( options, categoryShow ) {
     super( defaultOptions, options, categoryShow )
+    this.previewMode = options.previewMode;
 
     this.myId = new Date().getTime();
     let pcube_cc = getCookie('pcube_cc');
@@ -579,13 +580,23 @@ export default class Popup extends Base {
         this.tmpUserCategories[ checkbox.name ] = checkbox.checked ? 'ALLOW' : 'DENY'
       });
       
-      if (checkbox.name === 'ESSENTIAL') {
-        checkbox.disabled = true;
-        checkbox.checked = true;
-      }
-      else {
-        checkbox.addEventListener( 'click', event => (event.stopPropagation()) )
-        checkbox.checked = this.userCategories[ checkbox.name ] === 'ALLOW';
+      if (this.previewMode) {
+        if (checkbox.name === 'ESSENTIAL') {
+          checkbox.checked = true;
+          checkbox.disabled = true;
+        } else {
+          checkbox.checked = false;
+          checkbox.disabled = false;
+        }
+      } else {
+        if (checkbox.name === 'ESSENTIAL') {
+          checkbox.checked = true;
+          checkbox.disabled = true;
+        }
+        else{
+          checkbox.addEventListener('click', event => event.stopPropagation());
+          checkbox.checked = this.userCategories[checkbox.name] === 'ALLOW';
+        }
       }
     });
     el.querySelectorAll( '.cc-btn-checkbox' ).forEach( checkbox => {
