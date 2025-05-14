@@ -589,8 +589,14 @@ export default class Popup extends Base {
           checkbox.disabled = false;
         }
       } else {
-        checkbox.addEventListener('click', event => event.stopPropagation());
-        checkbox.checked = this.userCategories[checkbox.name] === 'ALLOW';
+        if (checkbox.name === 'ESSENTIAL') {
+          checkbox.checked = true;
+          checkbox.disabled = true;
+        }
+        else{
+          checkbox.addEventListener('click', event => event.stopPropagation());
+          checkbox.checked = this.userCategories[checkbox.name] === 'ALLOW';
+        }
       }
     });
     el.querySelectorAll( '.cc-btn-checkbox' ).forEach( checkbox => {
